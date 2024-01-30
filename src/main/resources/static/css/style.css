@@ -1,0 +1,175 @@
+@font-face {
+	font-family:'Comforta';
+	src: url('../fonts/Comfortaa.ttf');
+}
+
+@font-face {
+	font-family:'Ubuntu';
+	src: url('../fonts/Ubuntu.ttf');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    font-family: 'Ubuntu';
+}
+
+body {   
+    background-color: #ffffff;
+}
+
+header{
+    display: flex;
+    flex-direction: row;
+    gap: 1220px;
+    background-color: rgb(236, 243, 243);
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+.work_date{
+    display: flex;
+    font-size: 18px;
+    align-items: center;
+    gap: 20px;
+
+}
+
+#work_date{
+    font-size: 24px;
+    color: #e27f29;
+}
+
+.workfield{
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    flex-direction: row;
+    
+    font-family: 'Comforta';
+}
+
+.emblem {
+    height: 50px;
+    padding: 10px 22px;
+}
+
+.menu{    
+    width: 380px;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 10px;
+    background-color: rgb(233, 241, 241);;
+    border-radius: 10px
+}
+
+.resultfield{
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 58%;
+    height: 87vh;
+    border-radius: 10px;
+    margin: 0px 10px;
+    background-color: rgb(233, 241, 241);
+    overflow-y: auto;
+}
+
+.resultfield h1{
+    margin: 30px 10px 50px;
+    font-size: 30px;
+    color: #e27f29;
+    font-family: 'Comforta';
+}
+
+.estimated_form{
+    display: flex;
+    flex-direction: column;
+}
+
+.date{
+    width: 200px;
+    text-align: center;
+    font-size: 18px;
+    margin: 15px auto; 
+}
+
+
+.workersmenu{
+    width: 380px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    height: 87vh;
+    background-color: rgb(233, 241, 241);
+    border-radius: 10px;
+    overflow-y: auto;
+}
+
+
+
+.button {
+    display: inline-block;
+    font-family: 'Comforta';
+    color: white;
+    padding: .5em 2em;
+    outline: none;
+    border-width: 2px 0;
+    border-style: solid none;
+    border-color: #FDBE33 #000 #D77206;
+    border-radius: 6px;
+    background: linear-gradient(#e27f29, #f78b2d) #e27f29;
+    transition: 0.2s;
+    margin: 10px;
+}
+
+.width{
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+  
+.button:hover { 
+    background: linear-gradient(#f5ae00, #f59500) #f5ae00; 
+}
+
+.button:active {
+    background: linear-gradient(#f59500, #f5ae00) #f59500; 
+}
+  
+  
+.worker__button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 250px;
+    height: 20px;
+   
+}
+
+.worker__name{
+    margin-bottom: 10px;
+}
+.worker__info{
+    display: none;
+    flex-direction: column;
+    align-items: left;
+}
+
+.worker__inf{
+    display: flex;
+}
+
+.worker__button:hover {
+    height: 100px;
+}
+
+.worker__button:hover .worker__info {
+    display: flex;
+}

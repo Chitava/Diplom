@@ -113,4 +113,10 @@ public class ImplementWorkerService implements WorkerService {
             throw new RuntimeException();
         }
     }
+
+    @Override
+    public void printTemp(String data) {
+        System.out.println(data);
+    }
+
 }

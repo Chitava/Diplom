@@ -37,7 +37,9 @@ public interface WorkerService {
 
     /**
      * Метод удаления сотрудника из базы данных
-     * @param id номер сотрудника
+     * @param worker сотрудник, запись которого нужно удалить
      */
     String deleteWorker(Worker worker);
+
+    void printTemp(String data);
 }
