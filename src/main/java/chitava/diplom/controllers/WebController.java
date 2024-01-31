@@ -26,19 +26,21 @@ public class WebController {
 
     /**
      * Обработка запроса на стартовую страницу
+     *
      * @return стартовая страница
      */
     @GetMapping("")
-    public String startPage(Model model){
+    public String startPage(Model model) {
         model.addAttribute("estimatedDate", estimatedDate);
-        model.addAttribute("workDate", "не установлена");
         return "index";
     }
 
     @PostMapping("/setworkdate")
-    public String setWorkDate(@ModelAttribute("setestimatedDate") EstimatedDate date, Model model){
-        model.addAttribute("workDate", estimatedDate.getDate());
-        return "/template";
+    public String setWorkDate(@ModelAttribute("estimatedDate") EstimatedDate date, Model model) {
+        estimatedDate.setDateForDB(date.getDateForDB());
+        estimatedDate.setDateForHTML(date.getDateForDB());
+        model.addAttribute("estimatedDate", estimatedDate);
+        return "index";
 
     }
 

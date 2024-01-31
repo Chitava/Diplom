@@ -5,9 +5,8 @@ import chitava.diplom.repositorys.WorkersRepository;
 import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.Collection;
-import java.util.Optional;
+
 
 /**
  * Класс работы с записями сотрудников в базе данных
