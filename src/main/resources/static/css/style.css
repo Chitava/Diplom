@@ -1,3 +1,5 @@
+/*Подгружаемые шрифты*/
+
 @font-face {
 	font-family:'Comforta';
 	src: url('../fonts/Comfortaa.ttf');
@@ -8,6 +10,7 @@
 	src: url('../fonts/Ubuntu.ttf');
 }
 
+/*Стиль для всей страницы*/
 * {
     margin: 0;
     padding: 0;
@@ -15,11 +18,13 @@
     font-family: 'Ubuntu';
 }
 
+/*Стили для body*/
 body {   
     background-color: #ffffff;
     padding: 0 10px;
 }
 
+/*Стили для фрейма header (Логотип и расчетная дата)*/
 header{
     display: flex;
     flex-direction: row;
@@ -29,6 +34,7 @@ header{
     margin-top: 15px;
 }
 
+/*Стили полей с расчетной датой*/
 .work_date{
     display: flex;
     font-size: 18px;
@@ -37,11 +43,13 @@ header{
 
 }
 
+/*Стили для поля с датой расчета заработной платы*/
 #work_date{
     font-size: 24px;
     color: #e27f29;
 }
 
+/*Стили для общего рабочего фрейма*/
 .workfield{
     margin-top: 10px;
     display: flex;
@@ -51,12 +59,13 @@ header{
     
     font-family: 'Comforta';
 }
-
+/*Стили логотипа*/
 .emblem {
     height: 50px;
     padding: 10px 22px;
 }
 
+/*Стили для меню расположенного слева на всех страницах */
 .menu{    
     width: 380px;
     height: 85vh;
@@ -68,6 +77,7 @@ header{
     border-radius: 10px
 }
 
+/*Стили для рабочего фрейма вывода текущей информации на всех страницах*/
 .resultfield{
     text-align: center;
     display: flex;
@@ -81,6 +91,12 @@ header{
     overflow-y: auto;
 }
 
+/*Стиль для заголовка в рабочем фрейме*/
+.h1{
+    margin: 0 auto;
+    width: 80%;
+}
+
 .resultfield h1{
     margin: 30px 10px 50px;
     font-size: 30px;
@@ -88,19 +104,20 @@ header{
     font-family: 'Comforta';
 }
 
+/*Стиль формы выбора рабочей даты расчета зарплаты на странице index.html*/
 .estimated_form{
     display: flex;
     flex-direction: column;
 }
 
+/*Стили для поля выбора даты на странице index.html*/
 .date{
     width: 200px;
     text-align: center;
     font-size: 18px;
     margin: 15px auto; 
 }
-
-
+ /*Стили меню сотрудников расположенное с права на всех страницах*/
 .workersmenu{
     width: 380px;
     display: flex;
@@ -114,7 +131,7 @@ header{
 }
 
 
-
+/*стили для кнопок*/
 .button {
     display: inline-block;
     font-family: 'Comforta';
@@ -135,23 +152,24 @@ header{
     margin-left: auto;
     margin-right: auto;
 }
-  
+
+/*Стили срабатывают при наведение на кнопку*/
 .button:hover { 
     background: linear-gradient(#f5ae00, #f59500) #f5ae00; 
 }
 
+/*Ситили срабатывают при нажатии на кнопку*/
 .button:active {
     background: linear-gradient(#f59500, #f5ae00) #f59500; 
 }
   
-  
+/*Стили для кнопок с информацией о сотрудниках в меню сотрудников расположенное справа на всех страницах*/
 .worker__button {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 250px;
     height: 20px;
-   
 }
 
 .worker__name{
@@ -173,4 +191,72 @@ header{
 
 .worker__button:hover .worker__info {
     display: flex;
+}
+
+/*Стили для формы загрузки файлов на странице writer.html*/
+.file{
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 30px 10px 50px;
+    font-size: 30px;
+    color: #e27f29;
+    font-family: 'Comforta';
+    gap: 20px;
+}
+
+/*Стили для страницы addworker.html*/
+.worker{
+    display: flex;
+    flex-direction: row;
+    width: 90%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+
+/*Стили для полей со статическими названиями*/
+.worker__field{
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    align-items:flex-start;
+    gap: 20px;
+    font-size: 24px;
+    color: #e27f29;
+    font-family: 'Comforta';
+    justify-content: center;
+}
+
+/*Стили для динамических полей*/
+.worker_field_data{
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    align-items:flex-start;
+    gap: 23px;
+    font-family: 'Comforta';
+}
+
+/*Стили для полей ввода фио и табельный номер*/
+.input__width{
+    width: 100%;
+    font-size: 24px;
+    padding: 0 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+/*Стили для полей со ставками*/
+.input__heigh{
+    width: 100px;
+    font-size: 24px;
+    padding: 0 5px;
+    border-radius: 5px;
+    border: none;
+}
+
+/*Стили для поля селектора руководитель*/
+.check__box{
+    margin-left: -45px;
 }

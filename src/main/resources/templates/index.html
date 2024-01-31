@@ -3,7 +3,7 @@
 <head th:fragment="head">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Расчет зарплаты сотрудников INBULK</title>
+    <title>INBULK Расчет зарплаты сотрудников </title>
     <link th:href="@{/css/style.css}" rel="stylesheet">
     <link type="image/x-icon" href="img/inbulkicon.PNG" rel="shortcut icon">
 </head>
@@ -15,25 +15,25 @@
         </div>
         <div class="work_date">
             <p>Расчетная дата:</p>
-            <div th:id="work_date" th:if="${estimatedDate.dateForHTML}"></div>
-
+            <div th:id="work_date" th:text="${estimatedDate.dateForHTML}? ${estimatedDate.dateForHTML} :
+            'не установлена'"></div>
         </div>
     </header>
     <main class="workfield">
         <nav th:fragment="menu" class="menu">
-            <a href="index.html" class="button">Установить рабочую дату</a>
-            <a href="#" class="button">Записать новые данные</a>
-            <a href="#" class="button">Расчитать всех сотрудников</a>
+            <a th:href="@{/inbulk}" class="button">Установить рабочую дату</a>
+            <a th:href="@{/inbulk/writer}" class="button">Записать новые данные</a>
+            <a th:href="@{/inbulk}" class="button">Расчитать всех сотрудников</a>
             <a href="#" class="button">Расчитать сотрудника</a>
-            <a href="#" class="button">Добавить нового сотрудника</a>
+            <a th:href="@{/inbulk/addworker}" class="button">Добавить нового сотрудника</a>
             <a href="edit.html" class="button">Редактировать сотрудников</a>
             <a href="#" class="button">Удалить сотрудника</a>
         </nav>
         <section class="resultfield">
-            <h1>Расчет заработной платы за месяц сотрудникам ИП "Бабайцев В.А."</h1>
+            <div class="h1"><h1>Расчет заработной платы за месяц сотрудникам ИП "Бабайцев В.А."</h1></div>
             <h3>Выберите расчетную дату</h3>
             <form class="estimated_form" action="#" th:action="@{/inbulk/setworkdate}" th:object="${estimatedDate}" method="post">
-            <input class="date" type="month" th:field="*{dateForDB}" >
+            <input class="date" type="month" th:field="*{dateForDB}" value="">
                 <button class="button width">
                     Установить
                 </button>

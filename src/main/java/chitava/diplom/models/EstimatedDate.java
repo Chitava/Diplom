@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 public class EstimatedDate {
 
-
     //region поля
     private String dateForHTML;
     private String dateForDB;
@@ -78,6 +77,10 @@ public class EstimatedDate {
         }
     }
 
+    /**
+     *
+     * @param dateForDB дата для наименования таблиц в базе данных
+     */
     public void setDateForDB(String dateForDB) {
         this.dateForDB = dateForDB;
     }

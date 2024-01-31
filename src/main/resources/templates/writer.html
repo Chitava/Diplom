@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:insert= "~{index :: head}"></head>
+<body>
+  <div th:insert= "~{index :: header}"></div>
+  <main class="workfield">
+    <div th:insert= "~{index :: menu}"></div>
+    <section class="resultfield">
+      <div >
+        <form class="file" action="" method="post">
+          <label for="">Загрузите файл с данными посещения за месяц</label>
+          <input type="file" accept=".xls">
+          <button class="button">Загрузить</button>
+        </form>
+      </div>
+    </section>
+    <div th:insert= "~{index :: workersmenu}"></div>
+  </main>
+</body>
+</html>

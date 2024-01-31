@@ -25,8 +25,7 @@ public class WebController {
     private EstimatedDate estimatedDate;
 
     /**
-     * Обработка запроса на стартовую страницу
-     *
+     * Обработка запроса на стартовую страницу     *
      * @return стартовая страница
      */
     @GetMapping("")
@@ -35,14 +34,33 @@ public class WebController {
         return "index";
     }
 
+    /**
+     * Обработка страницы с установкой даты расчета заработной платы
+     * @param date Возвращаемый из формы HTML объект с датами расчета заработной платы
+     * @param model Создаем новую модель для новой страницы
+     * @return
+     */
     @PostMapping("/setworkdate")
     public String setWorkDate(@ModelAttribute("estimatedDate") EstimatedDate date, Model model) {
         estimatedDate.setDateForDB(date.getDateForDB());
         estimatedDate.setDateForHTML(date.getDateForDB());
         model.addAttribute("estimatedDate", estimatedDate);
         return "index";
-
     }
 
+    /**
+     * Обработка запроса страницы сохранения данных посещения за месяц сотрудниками
+     * @return страница с загрузкой файла
+     */
+    @GetMapping("/writer")
+    public String writeData(Model model){
+        model.addAttribute("estimatedDate", estimatedDate);
+        return "writer";
+    }
 
+    @GetMapping("/addworker")
+    public String addWorker(Model model){
+        model.addAttribute("estimatedDate", estimatedDate);
+        return "addworker";
+    }
 }
