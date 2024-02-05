@@ -1,2 +1,2 @@
-CREATE SCHEMA inbulk;
+CREATE DATABASE IF NOT EXISTS inbulk;
 USE inbulk;

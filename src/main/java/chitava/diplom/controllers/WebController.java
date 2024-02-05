@@ -1,15 +1,14 @@
 package chitava.diplom.controllers;
 
 import chitava.diplom.models.EstimatedDate;
+import chitava.diplom.models.Worker;
 import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Класс обработчик HTTP запросов
@@ -26,6 +25,7 @@ public class WebController {
 
     /**
      * Обработка запроса на стартовую страницу     *
+     *
      * @return стартовая страница
      */
     @GetMapping("")
@@ -36,7 +36,8 @@ public class WebController {
 
     /**
      * Обработка страницы с установкой даты расчета заработной платы
-     * @param date Возвращаемый из формы HTML объект с датами расчета заработной платы
+     *
+     * @param date  Возвращаемый из формы HTML объект с датами расчета заработной платы
      * @param model Создаем новую модель для новой страницы
      * @return
      */
@@ -50,17 +51,34 @@ public class WebController {
 
     /**
      * Обработка запроса страницы сохранения данных посещения за месяц сотрудниками
+     *
      * @return страница с загрузкой файла
      */
     @GetMapping("/writer")
-    public String writeData(Model model){
+    public String writeData(Model model) {
         model.addAttribute("estimatedDate", estimatedDate);
         return "writer";
     }
 
-    @GetMapping("/addworker")
-    public String addWorker(Model model){
+    @RequestMapping(value = "/add", method = RequestMethod.GET)
+    public String addWorker(Model model) {
         model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("worker", new Worker());
         return "addworker";
     }
+
+    @RequestMapping(value = "/addworker", method = RequestMethod.POST)
+    public String addNewWorker(@ModelAttribute("worker") Worker worker, Model model) {
+        model.addAttribute("estimatedDate", estimatedDate);
+        try {
+            service.createWorker(worker);
+            model.addAttribute("message", "Операция добавления нового сотрудника выполнена " +
+                    "успешно");
+            return "result";
+        } catch (Exception e) {
+            model.addAttribute(e.getMessage());
+            return "result";
+        }
+    }
 }
+

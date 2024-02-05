@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:insert= "~{index :: head}"></head>
+<body>
+  <div th:insert= "~{index :: header}"></div>
+  <main class="workfield">
+    <div th:insert= "~{index :: menu}"></div>
+    <section class="resultfield">
+      <h1 th:text="${message}" ></h1>
+    </section>
+    <div th:insert= "~{index :: workersmenu}"></div>
+  </main>
+</body>
+</html>

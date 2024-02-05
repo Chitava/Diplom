@@ -25,13 +25,21 @@ public class Worker {
     //region Поля
     @Id
     @Column(nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private boolean post;
+    private boolean post = false;
     private double paymentInDay;
     private double paymentInHour;
     private double peymentInHollydays;
     //endregion
 
+    public boolean getPost() {
+        return post;
+    }
+
+
+    public void setPost(boolean post) {
+        this.post = post;
+    }
 }

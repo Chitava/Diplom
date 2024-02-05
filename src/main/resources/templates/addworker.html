@@ -7,26 +7,27 @@
     <div th:insert= "~{index :: menu}"></div>
     <section th:class="resultfield">
       <h1>Создание нового сотрудника</h1>
-      <form th:class="add__worker" action="" method="post">
+      <form th:class="add__worker" th:action="@{/inbulk/addworker}" th:object="${worker}" method="post">
         <section th:class="worker">
           <div th:class="worker__field">
-            <div th:class="worker__txt">Табельный номер:</div>
-            <div th:class="worker__txt">Ф.И.О.:</div>
+            <div th:class="worker__txt" >Ф.И.О.:</div>
             <div th:class="worker__txt">Руководитель:</div>
             <div th:class="worker__txt">Ставка за день:</div>
             <div th:class="worker__txt">Ставка за час:</div>
             <div th:class="worker__txt">Ставка в выходные и праздничные дни:</div>
           </div>
           <div th:class=" worker_field_data">
-            <input th:class="input__width" type="text" class="worker__data"></input>
-            <input th:class="input__width" type="text" class="worker__data"></input>
-            <input class="input__heigh check__box" type="checkbox" name="workerpost"/>
-            <input th:class="input__heigh" type="number" step="50" min="0">
-            <input th:class="input__heigh" type="number" step="50" min="0">
-            <input th:class="input__heigh" type="number" step="50" min="0">
+            <input th:class="input__width" type="text" class="worker__data" th:field="*{name}" th:required="required">
+            <input class="input__heigh check__box" type="checkbox" name="post" th:field="*{post}">
+            <input th:class="input__heigh" type="number" step="50" min="50" th:field="*{paymentInDay}"
+                   th:required="required">
+            <input th:class="input__heigh" type="number" step="50" min="50" th:field="*{paymentInHour}"
+                   th:required="required">
+            <input th:class="input__heigh" type="number" step="50" min="50" th:field="*{peymentInHollydays}"
+                   th:required="required">
           </div>
         </section>
-        <button th:class="button">Сохранить данные сотрудника</button>
+        <button th:class="button" th:type="submit">Сохранить данные сотрудника</button>
       </form>
     </section>
     <div th:insert= "~{index :: workersmenu}"></div>

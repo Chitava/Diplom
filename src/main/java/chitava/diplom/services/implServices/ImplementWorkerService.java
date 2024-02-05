@@ -67,7 +67,7 @@ public class ImplementWorkerService implements WorkerService {
                 workerByID = repository.findById(worker.getId()).get();
                 workerByID.setId(worker.getId());
                 workerByID.setName(worker.getName());
-                workerByID.setPost(worker.isPost());
+                workerByID.setPost(worker.getPost());
                 workerByID.setPaymentInDay(worker.getPaymentInDay());
                 workerByID.setPaymentInHour(worker.getPaymentInHour());
                 workerByID.setPaymentInDay(worker.getPaymentInDay());
