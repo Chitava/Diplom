@@ -178,7 +178,10 @@ header{
 .worker__info{
     display: none;
     flex-direction: column;
+    margin-top: 15px;
     align-items: left;
+    gap:5px;
+
 }
 
 .worker__inf{
@@ -186,7 +189,7 @@ header{
 }
 
 .worker__button:hover {
-    height: 100px;
+    height: 150px;
 }
 
 .worker__button:hover .worker__info {

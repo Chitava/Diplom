@@ -40,7 +40,7 @@
             </form>
         </section>
         <section th:fragment="workersmenu" class="workersmenu">
-            <a th:each="w: ${workers}" th:href="@{'/worker/' + ${n.Id}}"class="button worker__button">
+            <a th:each="w: ${workers}" th:href="@{'/worker/' + ${w.id}}" class="button worker__button">
                 <div class="worker__name">
                     <h3 th:text="${w.name}"></h3>
                 </div>
@@ -49,28 +49,28 @@
                         <h4>
                             Должность:&nbsp
                         </h4>
-                        <span th:text="S{w.post} ? бригадир : рабочий">
+                        <span th:text="${w.post} ? 'руководитель' : 'рабочий'">
                         </span>
                     </div>
                     <div class="worker__inf">
                         <h4>
                             Ставка в день:&nbsp
                         </h4>
-                        <span th:text="S{w.paymentInDay}">
+                        <span th:text="${w.paymentInDay}">
                         </span> р.
                     </div>
                     <div class="worker__inf">
                         <h4>
                             Ставка за переработку:&nbsp
                         </h4>
-                        <span th:text="S{w.paymentInHour}">
+                        <span th:text="${w.paymentInHour}">
                         </span> р.
                     </div>
                     <div class="worker__inf">
                         <h4>
                             Ставка в выходные:&nbsp
                         </h4>
-                        <span th:text="S{w.peymentInHollydays}">
+                        <span th:text="${w.peymentInHollydays}">
                         </span> р.
                     </div>
                 </div>

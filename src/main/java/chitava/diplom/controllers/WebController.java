@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+
 /**
  * Класс обработчик HTTP запросов
  */
@@ -30,6 +32,8 @@ public class WebController {
      */
     @GetMapping("")
     public String startPage(Model model) {
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("workers", workers);
         model.addAttribute("estimatedDate", estimatedDate);
         return "index";
     }
@@ -43,6 +47,8 @@ public class WebController {
      */
     @PostMapping("/setworkdate")
     public String setWorkDate(@ModelAttribute("estimatedDate") EstimatedDate date, Model model) {
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("workers", workers);
         estimatedDate.setDateForDB(date.getDateForDB());
         estimatedDate.setDateForHTML(date.getDateForDB());
         model.addAttribute("estimatedDate", estimatedDate);
@@ -56,12 +62,16 @@ public class WebController {
      */
     @GetMapping("/writer")
     public String writeData(Model model) {
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("workers", workers);
         model.addAttribute("estimatedDate", estimatedDate);
         return "writer";
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.GET)
     public String addWorker(Model model) {
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("workers", workers);
         model.addAttribute("estimatedDate", estimatedDate);
         model.addAttribute("worker", new Worker());
         return "addworker";
@@ -69,8 +79,10 @@ public class WebController {
 
     @RequestMapping(value = "/addworker", method = RequestMethod.POST)
     public String addNewWorker(@ModelAttribute("worker") Worker worker, Model model) {
+        Collection<Worker> workers = service.getAllWorkers();
         model.addAttribute("estimatedDate", estimatedDate);
         try {
+            model.addAttribute("workers", workers);
             service.createWorker(worker);
             model.addAttribute("message", "Операция добавления нового сотрудника выполнена " +
                     "успешно");

@@ -17,14 +17,13 @@
             <div th:class="worker__txt">Ставка в выходные и праздничные дни:</div>
           </div>
           <div th:class=" worker_field_data">
-            <input th:class="input__width" type="text" class="worker__data" th:field="*{name}" th:required="required">
+            <input th:class="input__width" type="text" class="worker__data" th:field="*{name}" required>
             <input class="input__heigh check__box" type="checkbox" name="post" th:field="*{post}">
             <input th:class="input__heigh" type="number" step="50" min="50" th:field="*{paymentInDay}"
-                   th:required="required">
+                   required>
             <input th:class="input__heigh" type="number" step="50" min="50" th:field="*{paymentInHour}"
-                   th:required="required">
-            <input th:class="input__heigh" type="number" step="50" min="50" th:field="*{peymentInHollydays}"
-                   th:required="required">
+                   required>
+            <input th:class="input__heigh" type="number" step="50" min="50" th:field="*{peymentInHollydays}">
           </div>
         </section>
         <button th:class="button" th:type="submit">Сохранить данные сотрудника</button>
