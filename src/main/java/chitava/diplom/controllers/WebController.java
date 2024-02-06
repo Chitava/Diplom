@@ -85,6 +85,12 @@ public class WebController {
         return "addworker";
     }
 
+    /**
+     * Обработка страницы добавления нового сотрудника
+     * @param worker Новый сотрудник
+     * @param model Создаем новую модель для новой страницы
+     * @return страницу с рзультатом операции по добавлению нового сотрудника
+     */
     @RequestMapping(value = "/addworker", method = RequestMethod.POST)
     public String addNewWorker(@ModelAttribute("worker") Worker worker, Model model) {
         model.addAttribute("estimatedDate", estimatedDate);
@@ -102,6 +108,19 @@ public class WebController {
                 "успешно");
         model.addAttribute("workers", workers);
         return "result";
+    }
+
+    /**
+     * Обработка запроса на удаление сотрудника
+     * @param model Создаем новую модель для новой страницы
+     * @return страницу удаления сотрудника
+     */
+    @GetMapping("/del")
+    public String delWorker(Model model){
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("workers", workers);
+        return "delworkers";
     }
 }
 
