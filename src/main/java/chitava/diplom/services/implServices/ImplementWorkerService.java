@@ -114,6 +114,13 @@ public class ImplementWorkerService implements WorkerService {
     }
 
     @Override
+    public Worker findByName(String name) {
+
+        return repository.findByName(name);
+    }
+
+
+    @Override
     public void printTemp(String data) {
         System.out.println(data);
     }

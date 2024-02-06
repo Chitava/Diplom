@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface WorkersRepository extends JpaRepository<Worker, Long> {
     Optional<Worker> findById(Long id);
+    Worker findByName(String name);
 }

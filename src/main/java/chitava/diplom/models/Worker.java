@@ -27,6 +27,7 @@ public class Worker {
     @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String name;
     private boolean post = false;
     private double paymentInDay;

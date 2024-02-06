@@ -4,12 +4,11 @@ import chitava.diplom.models.EstimatedDate;
 import chitava.diplom.models.Worker;
 import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
-import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 /**
@@ -23,6 +22,9 @@ public class WebController {
      * Сервис для работы с записями сотрудников
      */
     private final WorkerService service;
+    /**
+     * Получение даты работы с базой данных
+     */
     private EstimatedDate estimatedDate;
 
     /**
@@ -68,6 +70,12 @@ public class WebController {
         return "writer";
     }
 
+    /**
+     * Обработка запроса страницы добавления нового сотрудника
+     *
+     * @param model модель отображения
+     * @return страницу с добавлением нового сотрудника
+     */
     @RequestMapping(value = "/add", method = RequestMethod.GET)
     public String addWorker(Model model) {
         Collection<Worker> workers = service.getAllWorkers();
@@ -79,18 +87,24 @@ public class WebController {
 
     @RequestMapping(value = "/addworker", method = RequestMethod.POST)
     public String addNewWorker(@ModelAttribute("worker") Worker worker, Model model) {
-        Collection<Worker> workers = service.getAllWorkers();
         model.addAttribute("estimatedDate", estimatedDate);
-        try {
-            model.addAttribute("workers", workers);
-            service.createWorker(worker);
-            model.addAttribute("message", "Операция добавления нового сотрудника выполнена " +
-                    "успешно");
-            return "result";
-        } catch (Exception e) {
-            model.addAttribute(e.getMessage());
-            return "result";
+        Collection<Worker> workers = service.getAllWorkers();
+        for (Worker w : workers) {
+            if (w.getName().equals(worker.getName())) {
+                model.addAttribute("message", "Сотрудник с таким именем уже присутствует");
+                model.addAttribute("workers", workers);
+                return "result";
+            }
         }
+        service.createWorker(worker);
+        workers.add(worker);
+        model.addAttribute("message", "Операция добавления нового сотрудника выполнена " +
+                "успешно");
+        model.addAttribute("workers", workers);
+        return "result";
     }
 }
+
+
+
 

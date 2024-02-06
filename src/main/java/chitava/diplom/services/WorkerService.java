@@ -41,5 +41,12 @@ public interface WorkerService {
      */
     String deleteWorker(Worker worker);
 
+    /**
+     * Поиск сотрудника в базе данных по имени
+     * @param name имя сотрудника
+     * @return есть или нет
+     */
+    Worker findByName(String name);
+
     void printTemp(String data);
 }
