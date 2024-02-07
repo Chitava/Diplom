@@ -154,6 +154,18 @@ public class WebController {
         model.addAttribute("workers", workers);
         return "delworker";
     }
+
+    @PostMapping("/delworker")
+    public String deleteWorker(@ModelAttribute("selected") Long id, Model model){
+        Worker worker = service.getWorkerById(id);
+        service.deleteWorker(worker);
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("workers", workers);
+        model.addAttribute("message", String.format("Операция удаления сотрудника %s выполнена " +
+                "успешно", worker.getName()));
+        return "result";
+    }
 }
 
 

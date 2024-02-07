@@ -7,8 +7,8 @@
     <div th:insert= "~{index :: menu}"></div>
     <section th:class="resultfield">
       <h1>Удаление сотрудника</h1>
-      <form th:class="delworker" th:action="@{/delworker}" method="post">
-        <select th:class="delworkers" >
+      <form th:class="delworker" th:action="@{/inbulk/delworker}" method="post">
+        <select th:class="delworkers" name="selected" >
           <option value="">Выбирете сотрудника</option>
           <option th:each="w: ${workers}" th:value="${w.id}" th:text="${w.name}"></option>
         </select>
