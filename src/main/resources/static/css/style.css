@@ -263,3 +263,21 @@ header{
 .check__box{
     margin-left: -45px;
 }
+
+/*Стили для страницы удаления сотрудников*/
+
+.delworker{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+.delworkers{
+    border: none;
+    width: 350px;
+    height: 30px;
+    font-family: 'Comforta';
+    font-size: 16px;
+    border-radius: 5px;
+}

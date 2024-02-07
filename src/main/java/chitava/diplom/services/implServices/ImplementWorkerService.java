@@ -6,6 +6,8 @@ import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 
 /**
@@ -29,10 +31,10 @@ public class ImplementWorkerService implements WorkerService {
     public Collection<Worker> getAllWorkers() {
         try {
             Collection<Worker> workers = repository.findAll();
-            return workers;
+            return workers.stream().sorted((w1, w2) -> w1.getName().compareTo(w2.getName())).collect(Collectors.toList());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -49,7 +51,7 @@ public class ImplementWorkerService implements WorkerService {
             return worker;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -76,7 +78,7 @@ public class ImplementWorkerService implements WorkerService {
             } else return "Неудалось обновить данные";
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -93,7 +95,7 @@ public class ImplementWorkerService implements WorkerService {
             return "Новый сотрудник успешно сохранен";
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -109,14 +111,20 @@ public class ImplementWorkerService implements WorkerService {
             return "Данные о сотрудник успешно удалены";
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e.getMessage());
         }
     }
 
     @Override
     public Worker findByName(String name) {
+        Worker worker =null;
+        try {
+            return repository.findByName(name);
 
-        return repository.findByName(name);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
 
