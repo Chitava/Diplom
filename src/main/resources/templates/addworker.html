@@ -14,16 +14,17 @@
             <div th:class="worker__txt">Руководитель:</div>
             <div th:class="worker__txt">Ставка за день:</div>
             <div th:class="worker__txt">Ставка за час:</div>
-            <div th:class="worker__txt">Ставка в выходные и праздничные дни:</div>
+            <div class="worker__txt peymentInHollydays" th:id="chek_hiden">Ставка в выходные и праздничные дни:</div>
           </div>
           <div th:class=" worker_field_data">
             <input th:class="input__width" type="text" class="worker__data" th:field="*{name}" required>
-            <input class="input__heigh check__box" type="checkbox" name="post" th:field="*{post}">
+            <input class="input__heigh check__box" type="checkbox" name="post" th:field="*{post}"
+                   th:onclick="OnChangeCheckbox(this)">
             <input th:class="input__heigh" type="number" step="50" min="50" th:field="*{paymentInDay}"
                    required>
             <input th:class="input__heigh" type="number" step="50" min="50" th:field="*{paymentInHour}"
                    required>
-            <input th:class="input__heigh" type="number" step="50" min="50" th:field="*{peymentInHollydays}">
+            <input th:class="input__heigh" type="number" step="50" min="0" th:field="*{peymentInHollydays}">
           </div>
         </section>
         <button th:class="button" th:type="submit">Сохранить данные сотрудника</button>
@@ -32,4 +33,16 @@
     <div th:insert= "~{index :: workersmenu}"></div>
   </main>
 </body>
+<script th:inline="javascript">
+        function OnChangeCheckbox (checkbox) {
+            if (checkbox.checked) {
+                document.getElementById('peymentInHollydays').style.display="flex";
+                document.getElementById('chek_hiden').style.display="flex";
+            }
+            else {
+                document.getElementById('peymentInHollydays').style.display="none";
+                document.getElementById('chek_hiden').style.display="none";
+            }
+        }
+       </script>
 </html>

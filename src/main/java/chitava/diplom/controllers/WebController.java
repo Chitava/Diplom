@@ -152,7 +152,7 @@ public class WebController {
         Collection<Worker> workers = service.getAllWorkers();
         model.addAttribute("estimatedDate", estimatedDate);
         model.addAttribute("workers", workers);
-        return "delworkers";
+        return "delworker";
     }
 }
 

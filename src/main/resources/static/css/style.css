@@ -181,7 +181,6 @@ header{
     margin-top: 15px;
     align-items: left;
     gap:5px;
-
 }
 
 .worker__inf{
@@ -239,6 +238,10 @@ header{
     align-items:flex-start;
     gap: 23px;
     font-family: 'Comforta';
+}
+
+.peymentInHollydays{
+    display: none;
 }
 
 /*Стили для полей ввода фио и табельный номер*/
