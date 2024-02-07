@@ -110,17 +110,11 @@ public class WebController {
     }
 
     /**
-<<<<<<< HEAD
-     * Обработка запроса на добавление нового сотрудника в базу данных
-     * @param worker Добавляемый сотрудник
-     * @param model Создаем новую модель для новой страницы
-     * @return страницу с результатом выполнения операции
-=======
+
      * Обработка страницы добавления нового сотрудника
      * @param worker Новый сотрудник
      * @param model Создаем новую модель для новой страницы
      * @return страницу с рзультатом операции по добавлению нового сотрудника
->>>>>>> 181a91239b45caaaf6f8073f4cf90666d1788c99
      */
     @RequestMapping(value = "/addworker", method = RequestMethod.POST)
     public String addNewWorker(@ModelAttribute("worker") Worker worker, Model model) {
@@ -147,22 +141,7 @@ public class WebController {
         return "result";
     }
 
-<<<<<<< HEAD
-    @GetMapping("/del")
-    public String delWorker(Model model){
-        Collection <Worker> workers = null;
-        try {
-            workers = service.getAllWorkers();
-        }catch (Exception e){
-            model.addAttribute("message", "Ошибка базы данных" + e);
-            return "result";
-        }
-        model.addAttribute("workers", workers);
-        model.addAttribute("estimatedDate", estimatedDate);
-        return "delworker";
-    }
 
-=======
     /**
      * Обработка запроса на удаление сотрудника
      * @param model Создаем новую модель для новой страницы
@@ -175,7 +154,6 @@ public class WebController {
         model.addAttribute("workers", workers);
         return "delworkers";
     }
->>>>>>> 181a91239b45caaaf6f8073f4cf90666d1788c99
 }
 
 
