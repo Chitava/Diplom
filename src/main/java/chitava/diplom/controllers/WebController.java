@@ -155,6 +155,12 @@ public class WebController {
         return "delworker";
     }
 
+    /**
+     * Метод обработки удаления сотрудника
+     * @param id идентификатор сотрудника
+     * @param model Создаем новую модель для новой страницы
+     * @return страницу с рзультатом операции по добавлению нового сотрудника
+     */
     @PostMapping("/delworker")
     public String deleteWorker(@ModelAttribute("selected") Long id, Model model){
         Worker worker = service.getWorkerById(id);
