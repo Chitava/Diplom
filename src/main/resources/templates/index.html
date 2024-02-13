@@ -26,7 +26,7 @@
             <a th:href="@{/inbulk}" class="button">Расчитать всех сотрудников</a>
             <a href="#" class="button">Расчитать сотрудника</a>
             <a th:href="@{/inbulk/add}" class="button">Добавить нового сотрудника</a>
-            <a href="edit.html" class="button">Редактировать сотрудников</a>
+            <a th:href="@{/inbulk/edit}" class="button">Редактировать сотрудников</a>
             <a th:href="@{/inbulk/del}" class="button">Удалить сотрудника</a>
         </nav>
         <section class="resultfield">
@@ -40,7 +40,7 @@
             </form>
         </section>
         <section th:fragment="workersmenu" class="workersmenu">
-            <a th:each="w: ${workers}" th:href="@{'/worker/' + ${w.id}}" class="button worker__button">
+            <a th:each="w: ${workers}" th:href="@{'/inbulk/worker/' + ${w.id}}" class="button worker__button">
                 <div class="worker__name">
                     <h3 th:text="${w.name}"></h3>
                 </div>

@@ -74,6 +74,7 @@ public class ImplementWorkerService implements WorkerService {
                 workerByID.setPaymentInHour(worker.getPaymentInHour());
                 workerByID.setPaymentInDay(worker.getPaymentInDay());
                 workerByID.setPeymentInHollydays(worker.getPeymentInHollydays());
+                repository.save(workerByID);
                 return "Данные о сотруднике успешно обновлены";
             } else return "Неудалось обновить данные";
         } catch (Exception e) {

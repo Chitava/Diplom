@@ -172,6 +172,57 @@ public class WebController {
                 "успешно", worker.getName()));
         return "result";
     }
+
+    /**
+     * Обработка запроса на редактирование сотрудника
+     * @param model Создаем новую модель для новой страницы
+     * @return страницу редактируемого сотрудника
+     */
+    @GetMapping("/edit")
+    public String edit(Model model){
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("workers", workers);
+        return "edit";
+    }
+
+    /**
+     * Метод обработки редактирования сотрудника
+     * @param id идентификатор сотрудника
+     * @param model Создаем новую модель для новой страницы
+     * @return страницу с рзультатом операции по добавлению нового сотрудника
+     */
+    @PostMapping("/editworker")
+    public String editWorker(@ModelAttribute("selected") Long id, Model model){
+        Worker worker = service.getWorkerById(id);
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("workers", workers);
+        model.addAttribute("worker", worker);
+        return "editworker";
+    }
+
+    @GetMapping("/worker/{id}")
+    public String eWorker (@PathVariable("id") Long id, Model model){
+        Worker worker = service.getWorkerById(id);
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("workers", workers);
+        model.addAttribute("worker", worker);
+        return "editworker";
+    }
+
+    @PostMapping("/workeredit")
+    public String saveEditWorker(Model model, Worker worker){
+        service.updateWorker(worker);
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("workers", workers);
+        model.addAttribute("message", String.format("Операция редактирования сотрудника выполнена " +
+                "успешно"));
+        return "result";
+    }
+
 }
 
 
