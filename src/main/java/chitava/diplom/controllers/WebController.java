@@ -202,6 +202,12 @@ public class WebController {
         return "editworker";
     }
 
+    /**
+     * Метод обработки редактирования сотрудника с кнопки сотрудника на правой панеле со списком сотрудников в HTML
+     * @param id идентификатор сотрудника
+     * @param model Создаем новую модель для новой страницы
+     * @return страница редактирования сотрудника
+     */
     @GetMapping("/worker/{id}")
     public String eWorker (@PathVariable("id") Long id, Model model){
         Worker worker = service.getWorkerById(id);
@@ -212,14 +218,21 @@ public class WebController {
         return "editworker";
     }
 
+
+    /**
+     * Метод редактирования сотрудника
+     * @param model Создаем новую модель для новой страницы
+     * @param worker Редактируемый сотрудник
+     * @return страница с результатами выполнения метода
+     */
     @PostMapping("/workeredit")
     public String saveEditWorker(Model model, Worker worker){
         service.updateWorker(worker);
         Collection<Worker> workers = service.getAllWorkers();
         model.addAttribute("estimatedDate", estimatedDate);
         model.addAttribute("workers", workers);
-        model.addAttribute("message", String.format("Операция редактирования сотрудника выполнена " +
-                "успешно"));
+        model.addAttribute("message", String.format("Операция редактирования сотрудника %s выполнена " +
+                "успешно", worker.getName()));
         return "result";
     }
 
