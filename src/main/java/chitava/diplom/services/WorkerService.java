@@ -1,5 +1,5 @@
 package chitava.diplom.services;
-
+import chitava.diplom.models.Hollydays;
 import chitava.diplom.models.Worker;
 
 import java.util.Collection;
@@ -47,6 +47,9 @@ public interface WorkerService {
      * @return есть или нет
      */
     Worker findByName(String name);
+
+
+    Hollydays getHollydays(String URL);
 
     void printTemp(String data);
 }

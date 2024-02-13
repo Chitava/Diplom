@@ -1,12 +1,17 @@
 package chitava.diplom.services.implServices;
 
+import chitava.diplom.models.Hollydays;
 import chitava.diplom.models.Worker;
 import chitava.diplom.repositorys.WorkersRepository;
 import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -14,13 +19,18 @@ import java.util.stream.Collectors;
  * Класс работы с записями сотрудников в базе данных
  */
 
+
+
 @Service
 @AllArgsConstructor
 public class ImplementWorkerService implements WorkerService {
+
+
+
     /**
      * Интерфейс для работы с базой данных
      */
-    private final WorkersRepository repository;
+    private WorkersRepository repository;
 
     /**
      * Метод получения всех сотрудников
@@ -126,6 +136,18 @@ public class ImplementWorkerService implements WorkerService {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    @Override
+    public Hollydays getHollydays(String URL) {
+        RestTemplate template =new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<Hollydays> responce = template.exchange(URL,
+                HttpMethod.GET,entity, Hollydays.class);
+        return responce.getBody();
+
     }
 
 
