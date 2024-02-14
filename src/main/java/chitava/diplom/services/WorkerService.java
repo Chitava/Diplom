@@ -49,7 +49,7 @@ public interface WorkerService {
     Worker findByName(String name);
 
 
-    Hollydays getHollydays(String URL);
+    String getHollydays(String year);
 
     void printTemp(String data);
 }

@@ -1,5 +1,6 @@
 package chitava.diplom.services.implServices;
 
+import chitava.diplom.models.Hollyday;
 import chitava.diplom.models.Hollydays;
 import chitava.diplom.models.Worker;
 import chitava.diplom.repositorys.WorkersRepository;
@@ -10,27 +11,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static chitava.diplom.models.Hollydays.yearHolidays;
 
 
 /**
  * Класс работы с записями сотрудников в базе данных
  */
 
-
-
 @Service
 @AllArgsConstructor
 public class ImplementWorkerService implements WorkerService {
-
 
 
     /**
      * Интерфейс для работы с базой данных
      */
     private WorkersRepository repository;
+
 
     /**
      * Метод получения всех сотрудников
@@ -128,26 +130,45 @@ public class ImplementWorkerService implements WorkerService {
 
     @Override
     public Worker findByName(String name) {
-        Worker worker =null;
+        Worker worker = null;
         try {
             return repository.findByName(name);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         }
     }
 
+    /**
+     * Метод получения праздничных дней в году для которого расчитывается зп
+     *
+     * @param year расчетный год
+     *             Данные записываются в коллекцию
+     */
     @Override
-    public Hollydays getHollydays(String URL) {
-        RestTemplate template =new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<Hollydays> responce = template.exchange(URL,
-                HttpMethod.GET,entity, Hollydays.class);
-        return responce.getBody();
-
+    public String getHollydays(String year) {
+        ResponseEntity<Hollydays> responce;
+        try {
+            String URL = String.format("https://production-calendar.ru/get/ru/%s/json", year);
+            RestTemplate template = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            responce = template.exchange(URL,
+                    HttpMethod.GET, entity, Hollydays.class);
+        } catch (Exception e) {
+            return "Ошибка подключения к календарю " + e.getMessage();
+        }
+            yearHolidays.clear();
+            Hollydays hollydays = responce.getBody();
+            for (Hollyday day : hollydays.getDays()) {
+                if (day.getType_text().equals("Государственный праздник")) {
+                    String date = day.getDate();
+                    yearHolidays.add(date);
+                }
+            }
+        return null;
     }
 
 

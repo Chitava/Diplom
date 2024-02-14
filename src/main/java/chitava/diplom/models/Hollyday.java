@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class Hollyday {
-
     String date;
     int type_id;
     String type_text;
