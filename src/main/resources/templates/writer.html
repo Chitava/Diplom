@@ -6,10 +6,10 @@
   <main class="workfield">
     <div th:insert= "~{index :: menu}"></div>
     <section class="resultfield">
-      <div >
-        <form class="file" action="" method="post">
+      <div>
+        <form class="file" th:action="@{/inbulk/upload}" method="post" enctype="multipart/form-data">
           <label for="">Загрузите файл с данными посещения за месяц</label>
-          <input type="file" accept=".xls">
+          <input type="file" name="file" accept=".xls">
           <button class="button">Загрузить</button>
         </form>
       </div>

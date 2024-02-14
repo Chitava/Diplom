@@ -7,8 +7,12 @@ import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
 
@@ -69,10 +73,10 @@ public class WebController {
         Hollydays.yearHolidays.clear();
         String year = estimatedDate.getDateForHTML().substring(estimatedDate.getDateForHTML().indexOf(" "));
         String message = service.getHollydays(year);
-        if (message==null) {
+        if (message == null) {
             model.addAttribute("estimatedDate", estimatedDate);
             return "index";
-        }else{
+        } else {
             model.addAttribute("message", message);
             return "result";
         }
@@ -251,6 +255,21 @@ public class WebController {
         return "result";
     }
 
+    /**
+     * Метод обработки загрузки новых данных о посещение за месяц
+     * @param file файл с данными посещения
+     * @param model Создаем новую модель для новой страницы
+     * @return страница с результатами выполнения метода
+     */
+    @PostMapping("/upload")
+    public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException {
+        service.addWorker(file);
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("workers", workers);
+        model.addAttribute("message", "Новые данные о сотрудниках загружены успешно");
+        return "result";
+    }
 }
 
 

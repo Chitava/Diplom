@@ -40,7 +40,8 @@
             </form>
         </section>
         <section th:fragment="workersmenu" class="workersmenu">
-            <a th:each="w: ${workers}" th:href="@{'/inbulk/worker/' + ${w.id}}" class="button worker__button">
+            <a th:each="w: ${workers}" th:href="@{'/inbulk/worker/' + ${w.id}}" class="button worker__button"
+            th:style="${w.newWorker} ? 'background: #9b5656; border-color:#9b5656'">
                 <div class="worker__name">
                     <h3 th:text="${w.name}"></h3>
                 </div>
