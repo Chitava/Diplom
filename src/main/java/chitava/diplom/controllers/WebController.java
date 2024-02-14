@@ -73,6 +73,7 @@ public class WebController {
         Hollydays.yearHolidays.clear();
         String year = estimatedDate.getDateForHTML().substring(estimatedDate.getDateForHTML().indexOf(" "));
         String message = service.getHollydays(year);
+        service.createWorkedHourTable("02_2024");
         if (message == null) {
             model.addAttribute("estimatedDate", estimatedDate);
             return "index";
@@ -236,7 +237,6 @@ public class WebController {
         return "editworker";
     }
 
-
     /**
      * Метод редактирования сотрудника
      *
@@ -263,11 +263,11 @@ public class WebController {
      */
     @PostMapping("/upload")
     public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException {
-        service.addWorker(file);
+        String message = service.addWorker(file);
         Collection<Worker> workers = service.getAllWorkers();
         model.addAttribute("estimatedDate", estimatedDate);
         model.addAttribute("workers", workers);
-        model.addAttribute("message", "Новые данные о сотрудниках загружены успешно");
+        model.addAttribute("message", message);
         return "result";
     }
 }

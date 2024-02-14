@@ -13,6 +13,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -184,22 +185,33 @@ public class ImplementWorkerService implements WorkerService {
         return null;
     }
 
-    public Collection<Worker> addWorker(MultipartFile file) throws IOException {
-        Collection<Worker> workers = new ArrayList<>();
-        POIFSFileSystem pSystem=new POIFSFileSystem(file.getInputStream());
-        HSSFWorkbook hb=new HSSFWorkbook(pSystem);
-        HSSFSheet sheet=hb.getSheetAt(0);
-        int lastrow = sheet.getLastRowNum();
-        for (int i = 0; i < lastrow; i = i+2) {
-            Row row = sheet.getRow(i);
-            Cell cell = row.getCell(1);
-            String workerName = cell.getStringCellValue().replace("\n","");
-            if (findByName(workerName) == null){
-                Worker newWorker = new Worker();
-                newWorker.setName(workerName);
-                newWorker.setNewWorker(true);
-                createWorker(newWorker);
-            }
+    public String addWorker(MultipartFile file) throws IOException {
+        try {
+            POIFSFileSystem pSystem = new POIFSFileSystem(file.getInputStream());
+            HSSFWorkbook hb = new HSSFWorkbook(pSystem);
+            HSSFSheet sheet = hb.getSheetAt(0);
+            int lastrow = sheet.getLastRowNum();
+            for (int i = 0; i < lastrow; i = i + 2) {
+                Row row = sheet.getRow(i);
+                Cell cell = row.getCell(1);
+                String workerName = cell.getStringCellValue().replace("\n", "");
+                if (findByName(workerName) == null) {
+                    Worker newWorker = new Worker();
+                    newWorker.setName(workerName);
+                    newWorker.setNewWorker(true);
+                    createWorker(newWorker);
+                }
+
+            }return "Новые данные о сотрудниках загружены успешно";
+        } catch (Exception e){
+            return "В процессе добавления новых сотрудников произошла ошибка " + e.getMessage();
+
+        }
+
+
+    }
+
+
 
 
 //            int lastCell = row.getLastCellNum();
@@ -208,22 +220,6 @@ public class ImplementWorkerService implements WorkerService {
 //                System.out.printf("Ячейка № %s - %s \n", j, cell);
 
 //            }
-        }
-
-        return workers;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

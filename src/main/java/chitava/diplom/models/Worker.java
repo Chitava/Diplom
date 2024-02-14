@@ -34,6 +34,8 @@ public class Worker {
     private double paymentInHour;
     private double peymentInHollydays;
     private boolean newWorker;
+
+
     //endregion
 
     public boolean getPost() {

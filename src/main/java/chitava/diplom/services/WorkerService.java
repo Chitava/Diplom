@@ -57,7 +57,8 @@ public interface WorkerService {
      */
     String getHollydays(String year);
 
-    Collection<Worker> addWorker(MultipartFile file) throws IOException;
+    String addWorker(MultipartFile file) throws IOException;
+
 
 
 }
