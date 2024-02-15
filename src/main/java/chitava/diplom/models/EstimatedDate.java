@@ -1,6 +1,5 @@
 package chitava.diplom.models;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -10,13 +9,18 @@ import org.springframework.stereotype.Component;
  * Поле dateForHTML - дата для отображение в HTML
  * Поле dateForDB - дата для названий таблиц в базе данных
  */
-
+@Getter
+@Component
 
 public class EstimatedDate {
 
     //region поля
-    public static String dateForHTML;
-    public static String dateForDB;
+    private String dateForHTML;
+    private String dateForDB;
+
+    public EstimatedDate() {
+        this.dateForHTML = "не установлена";
+    }
     //endregion
 
     //region setters
@@ -26,7 +30,7 @@ public class EstimatedDate {
      * @param date дата из формы HTML, приходит в виде гггг-мм
      * переводим в месяц гггг
      */
-    public static void setDateForHTML(String date) {
+    public void setDateForHTML(String date) {
         StringBuilder bilder = new StringBuilder();
         if(date !="" && date != null ) {
             String month = date.substring(date.indexOf("-") + 1);
@@ -70,18 +74,18 @@ public class EstimatedDate {
                     break;
             }
             bilder.append(month).append(" ").append(year);
-            dateForHTML = bilder.toString();
+            this.dateForHTML = bilder.toString();
         }else{
-            dateForHTML ="";
+            this.dateForHTML ="не устанавливалась";
         }
     }
 
     /**
      *
-     * @param date дата для наименования таблиц в базе данных
+     * @param dateForDB дата для наименования таблиц в базе данных
      */
-    public static void setDateForDB(String date) {
-        dateForDB = date;
+    public void setDateForDB(String dateForDB) {
+        this.dateForDB = dateForDB;
     }
     //endregion
 }

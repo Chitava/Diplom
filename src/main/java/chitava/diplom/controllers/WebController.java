@@ -5,14 +5,21 @@ import chitava.diplom.models.Hollydays;
 import chitava.diplom.models.Worker;
 import chitava.diplom.services.WorkedHoursService;
 import chitava.diplom.services.WorkerService;
+import chitava.diplom.services.implServices.ImplementWorkerService;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
 
 /**
@@ -25,17 +32,11 @@ public class WebController {
     /**
      * Сервис для работы с записями сотрудников
      */
-
     private final WorkerService service;
-
     /**
-     * Сервис расчетов рабочего времени и зарплаты
+     * Получение даты работы с базой данных
      */
-
-    private final WorkedHoursService hourService;
-
-
-
+    private final EstimatedDate estimatedDate;
 
     /**
      * Обработка запроса на стартовую страницу
@@ -44,16 +45,16 @@ public class WebController {
      */
     @GetMapping("")
     public String startPage(Model model) {
-
         Collection<Worker> workers = null;
         try {
             workers = service.getAllWorkers();
         } catch (Exception e) {
-            model.addAttribute("message", "Ошибка базы данных" + e);
+            model.addAttribute("message", "Ошибка базы данных " + e);
             return "result";
         }
         model.addAttribute("workers", workers);
-        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("estimatedDate", estimatedDate);
+
         return "index";
     }
 
@@ -66,7 +67,6 @@ public class WebController {
      */
     @PostMapping("/setworkdate")
     public String setWorkDate(@ModelAttribute("estimatedDate") EstimatedDate date, Model model) {
-
         Collection<Worker> workers = null;
         try {
             workers = service.getAllWorkers();
@@ -75,17 +75,23 @@ public class WebController {
             return "result";
         }
         model.addAttribute("workers", workers);
-        EstimatedDate.setDateForDB(date.getDateForDB());
-        EstimatedDate.setDateForHTML(date.getDateForDB());
+        estimatedDate.setDateForDB(date.getDateForDB());
+        estimatedDate.setDateForHTML(date.getDateForDB());
         Hollydays.yearHolidays.clear();
-        String year = estimatedDate.getDateForHTML().substring(estimatedDate.getDateForHTML().indexOf(" "));
-        String message = service.getHollydays(year);
+        try {
 
-        if (message == null) {
-            model.addAttribute("estimatedDate", estimatedDate);
-            return "index";
-        } else {
-            model.addAttribute("message", message);
+            String year = estimatedDate.getDateForHTML().substring(estimatedDate.getDateForHTML().indexOf(" "));
+            String message = service.getHollydays(year);
+
+            if (message == null) {
+                model.addAttribute("estimatedDate", estimatedDate);
+                return "index";
+            } else {
+                model.addAttribute("message", message);
+                return "result";
+            }
+        } catch (StringIndexOutOfBoundsException e) {
+            model.addAttribute("message", "Ошибка выбора даты");
             return "result";
         }
     }
@@ -264,18 +270,18 @@ public class WebController {
 
     /**
      * Метод обработки загрузки новых данных о посещение за месяц
-     * @param file файл с данными посещения
+     *
+     * @param file  файл с данными посещения
      * @param model Создаем новую модель для новой страницы
      * @return страница с результатами выполнения метода
      */
     @PostMapping("/upload")
     public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException {
-        String messageWorker = service.addWorker(file);
-        String mesageHour = hourService.addWorkedHours(file);
+        String message = service.addWorker(file);
         Collection<Worker> workers = service.getAllWorkers();
         model.addAttribute("estimatedDate", estimatedDate);
         model.addAttribute("workers", workers);
-        model.addAttribute("message", messageWorker + mesageHour);
+        model.addAttribute("message", message);
         return "result";
     }
 
