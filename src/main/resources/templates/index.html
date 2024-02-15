@@ -15,7 +15,7 @@
         </div>
         <div class="work_date">
             <p>Расчетная дата:</p>
-            <div th:id="work_date" th:text="${estimatedDate.dateForHTML}? ${estimatedDate.dateForHTML} :
+            <div th:id="work_date" th:text="${EstimatedDate.dateForHTML}? ${EstimatedDate.dateForHTML} :
             'не установлена'"></div>
         </div>
     </header>
@@ -23,7 +23,7 @@
         <nav th:fragment="menu" class="menu">
             <a th:href="@{/inbulk}" class="button">Установить рабочую дату</a>
             <a th:href="@{/inbulk/writer}" class="button">Записать новые данные</a>
-            <a th:href="@{/inbulk}" class="button">Расчитать всех сотрудников</a>
+            <a th:href="@{/inbulk/calc}" class="button">Расчитать всех сотрудников</a>
             <a href="#" class="button">Расчитать сотрудника</a>
             <a th:href="@{/inbulk/add}" class="button">Добавить нового сотрудника</a>
             <a th:href="@{/inbulk/edit}" class="button">Редактировать сотрудников</a>

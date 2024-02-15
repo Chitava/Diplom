@@ -3,17 +3,16 @@ package chitava.diplom.controllers;
 import chitava.diplom.models.EstimatedDate;
 import chitava.diplom.models.Hollydays;
 import chitava.diplom.models.Worker;
+import chitava.diplom.services.WorkedHoursService;
 import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collection;
 
 /**
@@ -26,19 +25,26 @@ public class WebController {
     /**
      * Сервис для работы с записями сотрудников
      */
+
     private final WorkerService service;
-    /**
-     * Получение даты работы с базой данных
-     */
-    private EstimatedDate estimatedDate;
 
     /**
-     * Обработка запроса на стартовую страницу     *
+     * Сервис расчетов рабочего времени и зарплаты
+     */
+
+    private final WorkedHoursService hourService;
+
+
+
+
+    /**
+     * Обработка запроса на стартовую страницу
      *
      * @return стартовая страница
      */
     @GetMapping("")
     public String startPage(Model model) {
+
         Collection<Worker> workers = null;
         try {
             workers = service.getAllWorkers();
@@ -47,7 +53,7 @@ public class WebController {
             return "result";
         }
         model.addAttribute("workers", workers);
-        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         return "index";
     }
 
@@ -60,6 +66,7 @@ public class WebController {
      */
     @PostMapping("/setworkdate")
     public String setWorkDate(@ModelAttribute("estimatedDate") EstimatedDate date, Model model) {
+
         Collection<Worker> workers = null;
         try {
             workers = service.getAllWorkers();
@@ -68,12 +75,12 @@ public class WebController {
             return "result";
         }
         model.addAttribute("workers", workers);
-        estimatedDate.setDateForDB(date.getDateForDB());
-        estimatedDate.setDateForHTML(date.getDateForDB());
+        EstimatedDate.setDateForDB(date.getDateForDB());
+        EstimatedDate.setDateForHTML(date.getDateForDB());
         Hollydays.yearHolidays.clear();
         String year = estimatedDate.getDateForHTML().substring(estimatedDate.getDateForHTML().indexOf(" "));
         String message = service.getHollydays(year);
-        service.createWorkedHourTable("02_2024");
+
         if (message == null) {
             model.addAttribute("estimatedDate", estimatedDate);
             return "index";
@@ -263,13 +270,16 @@ public class WebController {
      */
     @PostMapping("/upload")
     public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException {
-        String message = service.addWorker(file);
+        String messageWorker = service.addWorker(file);
+        String mesageHour = hourService.addWorkedHours(file);
         Collection<Worker> workers = service.getAllWorkers();
         model.addAttribute("estimatedDate", estimatedDate);
         model.addAttribute("workers", workers);
-        model.addAttribute("message", message);
+        model.addAttribute("message", messageWorker + mesageHour);
         return "result";
     }
+
+
 }
 
 
