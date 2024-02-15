@@ -11,13 +11,16 @@ import org.springframework.stereotype.Component;
  */
 @Getter
 @Component
-@AllArgsConstructor
-@NoArgsConstructor
+
 public class EstimatedDate {
 
     //region поля
     private String dateForHTML;
     private String dateForDB;
+
+    public EstimatedDate() {
+        this.dateForHTML = "не установлена";
+    }
     //endregion
 
     //region setters
@@ -73,7 +76,7 @@ public class EstimatedDate {
             bilder.append(month).append(" ").append(year);
             this.dateForHTML = bilder.toString();
         }else{
-            this.dateForHTML ="";
+            this.dateForHTML ="не устанавливалась";
         }
     }
 

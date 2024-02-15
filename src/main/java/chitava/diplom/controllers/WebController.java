@@ -3,8 +3,14 @@ package chitava.diplom.controllers;
 import chitava.diplom.models.EstimatedDate;
 import chitava.diplom.models.Hollydays;
 import chitava.diplom.models.Worker;
+import chitava.diplom.services.WorkedHoursService;
 import chitava.diplom.services.WorkerService;
+import chitava.diplom.services.implServices.ImplementWorkerService;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +34,10 @@ public class WebController {
     /**
      * Получение даты работы с базой данных
      */
-    private EstimatedDate estimatedDate;
+    private final EstimatedDate estimatedDate;
 
     /**
-     * Обработка запроса на стартовую страницу     *
+     * Обработка запроса на стартовую страницу
      *
      * @return стартовая страница
      */
@@ -47,6 +53,7 @@ public class WebController {
         }
         model.addAttribute("workers", workers);
         model.addAttribute("estimatedDate", estimatedDate);
+
         return "index";
     }
 
@@ -70,14 +77,18 @@ public class WebController {
         estimatedDate.setDateForDB(date.getDateForDB());
         estimatedDate.setDateForHTML(date.getDateForDB());
         Hollydays.yearHolidays.clear();
-        String year = estimatedDate.getDateForHTML().substring(estimatedDate.getDateForHTML().indexOf(" "));
-        String message = service.getHollydays(year);
-
-        if (message == null) {
-            model.addAttribute("estimatedDate", estimatedDate);
-            return "index";
-        } else {
-            model.addAttribute("message", message);
+        try {
+            String year = estimatedDate.getDateForHTML().substring(estimatedDate.getDateForHTML().indexOf(" "));
+            String message = service.getHollydays(year);
+            if (message == null) {
+                model.addAttribute("estimatedDate", estimatedDate);
+                return "index";
+            } else {
+                model.addAttribute("message", message);
+                return "result";
+            }
+        } catch (StringIndexOutOfBoundsException e) {
+            model.addAttribute("message", "Ошибка выбора даты");
             return "result";
         }
     }
@@ -256,7 +267,8 @@ public class WebController {
 
     /**
      * Метод обработки загрузки новых данных о посещение за месяц
-     * @param file файл с данными посещения
+     *
+     * @param file  файл с данными посещения
      * @param model Создаем новую модель для новой страницы
      * @return страница с результатами выполнения метода
      */
@@ -269,6 +281,8 @@ public class WebController {
         model.addAttribute("message", message);
         return "result";
     }
+
+
 }
 
 

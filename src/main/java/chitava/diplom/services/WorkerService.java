@@ -1,8 +1,6 @@
 package chitava.diplom.services;
-import chitava.diplom.models.Hollydays;
 import chitava.diplom.models.Worker;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.Collection;
 
@@ -58,6 +56,8 @@ public interface WorkerService {
     String getHollydays(String year);
 
     String addWorker(MultipartFile file) throws IOException;
+
+
 
 
 

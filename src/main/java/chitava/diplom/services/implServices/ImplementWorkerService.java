@@ -2,32 +2,27 @@ package chitava.diplom.services.implServices;
 
 import chitava.diplom.models.Hollyday;
 import chitava.diplom.models.Hollydays;
+import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
 import chitava.diplom.repositorys.WorkersRepository;
 import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.hibernate.Session;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static chitava.diplom.models.Hollydays.yearHolidays;
 
 
@@ -39,6 +34,7 @@ import static chitava.diplom.models.Hollydays.yearHolidays;
 @AllArgsConstructor
 public class ImplementWorkerService implements WorkerService {
 
+    private WorkedHours workedHours;
 
     /**
      * Интерфейс для работы с базой данных
@@ -186,6 +182,7 @@ public class ImplementWorkerService implements WorkerService {
     }
 
     public String addWorker(MultipartFile file) throws IOException {
+        int count = 0;
         try {
             POIFSFileSystem pSystem = new POIFSFileSystem(file.getInputStream());
             HSSFWorkbook hb = new HSSFWorkbook(pSystem);
@@ -195,13 +192,14 @@ public class ImplementWorkerService implements WorkerService {
                 Row row = sheet.getRow(i);
                 Cell cell = row.getCell(1);
                 String workerName = cell.getStringCellValue().replace("\n", "");
-                if (findByName(workerName) == null) {
+                Worker worker = findByName(workerName);
+                if (worker == null) {
                     Worker newWorker = new Worker();
                     newWorker.setName(workerName);
                     newWorker.setNewWorker(true);
                     createWorker(newWorker);
+                    count++;
                 }
-
             }return "Новые данные о сотрудниках загружены успешно";
         } catch (Exception e){
             return "В процессе добавления новых сотрудников произошла ошибка " + e.getMessage();
@@ -211,15 +209,53 @@ public class ImplementWorkerService implements WorkerService {
 
     }
 
+    public void addTime(String times) {
+        if (!times.equals("--\n--\n--") && times.length() != 0) {
+            String[] str = times.split("\n");
+            int hour = Integer.parseInt(str[2].substring(0, str[2].indexOf(":")));
+            int minute = Integer.parseInt(str[2].substring(str[2].indexOf(":") + 1));
+            LocalDateTime time = LocalDateTime.of(2024, 02, 1, hour, minute);
+            workedHours.addTime(time);
+        }
+    }
 
-
-
-//            int lastCell = row.getLastCellNum();
-//            for (int j = 0; j < lastCell; j++) {
-//                Cell cell = row.getCell(j);
-//                System.out.printf("Ячейка № %s - %s \n", j, cell);
-
-//            }
+    public String addWorkedHours(MultipartFile file) throws IOException {
+        Worker worker;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        try {
+            POIFSFileSystem pSystem = new POIFSFileSystem(file.getInputStream());
+            HSSFWorkbook hb = new HSSFWorkbook(pSystem);
+            HSSFSheet sheet = hb.getSheetAt(0);
+            int lastrow = sheet.getLastRowNum();
+            for (int i = 0; i < lastrow; i = i + 2) {
+                Row row = sheet.getRow(i);
+                int lastCell = row.getLastCellNum();
+                try {
+                    Integer.parseInt(String.valueOf(row.getCell(0)));
+                    worker = repository.findByName(String.valueOf(row.getCell(1)));
+                    workedHours = new WorkedHours();
+                    workedHours.setWorker(worker);
+                    for (int j = 3; j < lastCell - 1; j++) {
+                        String fullTime = String.valueOf(row.getCell(j));
+                        addTime(fullTime);
+                    }
+                    System.out.println(worker.getName());
+                } catch (NumberFormatException e) {
+                    for (int j = 3; j < lastCell - 1; j++) {
+                        String fullTime = String.valueOf(row.getCell(j));
+                        addTime(fullTime);
+                    }
+                }for (LocalDateTime time: workedHours.getWorkedDaysHours()) {
+                    System.out.print(time.format(formatter) + " ч. ");
+                }
+                System.out.println("");
+                return "Новые данные о посещении загружены успешно";
+            }
+        } catch (Exception e) {
+            return "В процессе добавления новых данных произошла ошибка " + e.getMessage();
+        }
+        return null;
+    }
 
 
 }
