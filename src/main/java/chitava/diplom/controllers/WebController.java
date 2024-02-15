@@ -7,13 +7,9 @@ import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collection;
 
 /**
@@ -27,6 +23,8 @@ public class WebController {
      * Сервис для работы с записями сотрудников
      */
     private final WorkerService service;
+
+
     /**
      * Получение даты работы с базой данных
      */
@@ -43,6 +41,7 @@ public class WebController {
         try {
             workers = service.getAllWorkers();
         } catch (Exception e) {
+            model.addAttribute("estimatedDate", estimatedDate);
             model.addAttribute("message", "Ошибка базы данных" + e);
             return "result";
         }
@@ -73,7 +72,7 @@ public class WebController {
         Hollydays.yearHolidays.clear();
         String year = estimatedDate.getDateForHTML().substring(estimatedDate.getDateForHTML().indexOf(" "));
         String message = service.getHollydays(year);
-        service.createWorkedHourTable("02_2024");
+
         if (message == null) {
             model.addAttribute("estimatedDate", estimatedDate);
             return "index";
