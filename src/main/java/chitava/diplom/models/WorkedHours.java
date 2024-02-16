@@ -1,5 +1,6 @@
 package chitava.diplom.models;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Data
-
+@Entity
 public class WorkedHours {
     @Id
     Long id;
