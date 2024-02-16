@@ -284,3 +284,8 @@ header{
     font-size: 16px;
     border-radius: 5px;
 }
+
+.delbuttion{
+    display: flex;
+    justify-content:center;
+}

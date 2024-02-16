@@ -199,6 +199,20 @@ public class WebController {
         return "result";
     }
 
+
+    @GetMapping("/delw/{id}")
+    public String getDelWorker(@PathVariable Long id, Model model){
+        Worker worker = service.getWorkerById(id);
+        service.deleteWorker(worker);
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("workers", workers);
+        model.addAttribute("message", String.format("Операция удаления сотрудника %s выполнена " +
+                "успешно", worker.getName()));
+
+        return "result";
+    }
+
     /**
      * Обработка запроса на редактирование сотрудника
      *
@@ -274,12 +288,20 @@ public class WebController {
      */
     @PostMapping("/upload")
     public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException {
-        String message = service.addWorker(file);
-        Collection<Worker> workers = service.getAllWorkers();
-        model.addAttribute("estimatedDate", estimatedDate);
-        model.addAttribute("workers", workers);
-        model.addAttribute("message", message);
-        return "result";
+        if (estimatedDate.getDateForHTML() == "не установлена"){
+            Collection<Worker> workers = service.getAllWorkers();
+            model.addAttribute("estimatedDate", estimatedDate);
+            model.addAttribute("workers", workers);
+            model.addAttribute("message", "Вы не установили дату расчета");
+            return "result";
+        }else {
+            String message = service.addWorker(file);
+            Collection<Worker> workers = service.getAllWorkers();
+            model.addAttribute("estimatedDate", estimatedDate);
+            model.addAttribute("workers", workers);
+            model.addAttribute("message", message);
+            return "result";
+        }
     }
 
 

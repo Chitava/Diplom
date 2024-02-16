@@ -25,13 +25,20 @@
                    required th:value="${worker.paymentInDay}">
             <input th:class="input__heigh" type="number" step="50" min="50" th:field="*{paymentInHour}"
                    required th:value="${worker.paymentInHour}">
-            <input th:style="${worker.post}? 'display:flex' : 'display:none'"  id="reset" class="input__heigh peymentInHollydays"
-                   type="number" step="50" min="0" th:field="*{peymentInHollydays}" th:value="${worker.peymentInHollydays}">
+            <input th:style="${worker.post}? 'display:flex' : 'display:none'"  id="reset"
+                   class="input__heigh peymentInHollydays"
+                   type="number" step="50" min="0" th:field="*{peymentInHollydays}"
+                   th:value="${worker.peymentInHollydays}">
           </div>
         </section>
         <button th:class="button" th:type="submit">Сохранить данные сотрудника</button>
-
       </form>
+        <div class="delbuttion">
+            <a style="width: 222px; height: 13px;" th:href="@{'/inbulk/delw/' + ${worker.id}}" class="button"
+               > Удалить сотрудника
+            </a>
+        </div>
+
     </section>
     <div th:insert= "~{index :: workersmenu}"></div>
   </main>

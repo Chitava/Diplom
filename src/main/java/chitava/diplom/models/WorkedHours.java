@@ -1,27 +1,30 @@
 package chitava.diplom.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 @Data
-@Entity
-@NoArgsConstructor
-@AllArgsConstructor
-public class WorkedHours {
-    Long id;
-    private Map<String, Collection<Double>> workedHours;
 
-    public void addTime(String name, Collection<Double> time) {
-        this.workedHours.put(name, time);
+public class WorkedHours {
+    @Id
+    Long id;
+    String workerName;
+
+    private Collection<LocalTime> workedHours;
+
+    public WorkedHours() {
+        this.workedHours = new ArrayList<>();
+    }
+
+    public void addTime(LocalTime time) {
+        this.workedHours.add(time);
     }
 }
