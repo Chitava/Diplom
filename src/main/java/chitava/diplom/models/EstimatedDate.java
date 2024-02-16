@@ -30,7 +30,7 @@ public class EstimatedDate {
      * @param date дата из формы HTML, приходит в виде гггг-мм
      * переводим в месяц гггг
      */
-    public void setDateForHTML(String date) {
+    public static void setDateForHTML(String date) {
         StringBuilder bilder = new StringBuilder();
         if(date !="" && date != null ) {
             String month = date.substring(date.indexOf("-") + 1);
@@ -74,18 +74,18 @@ public class EstimatedDate {
                     break;
             }
             bilder.append(month).append(" ").append(year);
-            this.dateForHTML = bilder.toString();
+            dateForHTML = bilder.toString();
         }else{
-            this.dateForHTML ="не устанавливалась";
+            dateForHTML ="не устанавливалась";
         }
     }
 
     /**
      *
-     * @param dateForDB дата для наименования таблиц в базе данных
+     * @param date дата для наименования таблиц в базе данных
      */
-    public void setDateForDB(String dateForDB) {
-        this.dateForDB = dateForDB;
+    public static void setDateForDB(String date) {
+        dateForDB = date;
     }
     //endregion
 }

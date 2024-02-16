@@ -24,12 +24,6 @@ public class WorkerWebController {
      */
     private final WorkerService service;
 
-
-    /**
-     * Получение даты работы с базой данных
-     */
-    private final EstimatedDate estimatedDate;
-
     /**
      * Обработка запроса на стартовую страницу
      *
@@ -41,12 +35,12 @@ public class WorkerWebController {
         try {
             workers = service.getAllWorkers();
         } catch (Exception e) {
-            model.addAttribute("estimatedDate", estimatedDate);
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("message", "Ошибка базы данных" + e);
             return "result";
         }
         model.addAttribute("workers", workers);
-        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
 
         return "index";
     }
@@ -59,7 +53,7 @@ public class WorkerWebController {
      * @return
      */
     @PostMapping("/setworkdate")
-    public String setWorkDate(@ModelAttribute("estimatedDate") EstimatedDate date, Model model) {
+    public String setWorkDate(@ModelAttribute("estimatedDate") String date, Model model) {
         Collection<Worker> workers = null;
         try {
             workers = service.getAllWorkers();
@@ -68,14 +62,14 @@ public class WorkerWebController {
             return "result";
         }
         model.addAttribute("workers", workers);
-        estimatedDate.setDateForDB(date.getDateForDB());
-        estimatedDate.setDateForHTML(date.getDateForDB());
+        EstimatedDate.setDateForDB(date);
+        EstimatedDate.setDateForHTML(date);
         Hollydays.yearHolidays.clear();
         try {
-            String year = estimatedDate.getDateForHTML().substring(estimatedDate.getDateForHTML().indexOf(" "));
+            String year = EstimatedDate.dateForHTML.substring(EstimatedDate.dateForHTML.indexOf(" "));
             String message = service.getHollydays(year);
             if (message == null) {
-                model.addAttribute("estimatedDate", estimatedDate);
+                model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
                 return "index";
             } else {
                 model.addAttribute("message", message);
@@ -102,7 +96,7 @@ public class WorkerWebController {
             return "result";
         }
         model.addAttribute("workers", workers);
-        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         return "writer";
     }
 
@@ -122,7 +116,7 @@ public class WorkerWebController {
             return "result";
         }
         model.addAttribute("workers", workers);
-        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("worker", new Worker());
         return "addworker";
     }
@@ -136,7 +130,7 @@ public class WorkerWebController {
      */
     @RequestMapping(value = "/addworker", method = RequestMethod.POST)
     public String addNewWorker(@ModelAttribute("worker") Worker worker, Model model) {
-        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         Collection<Worker> workers = null;
         try {
             workers = service.getAllWorkers();
@@ -169,7 +163,7 @@ public class WorkerWebController {
     @GetMapping("/del")
     public String delWorker(Model model) {
         Collection<Worker> workers = service.getAllWorkers();
-        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         return "delworker";
     }
@@ -186,7 +180,7 @@ public class WorkerWebController {
         Worker worker = service.getWorkerById(id);
         service.deleteWorker(worker);
         Collection<Worker> workers = service.getAllWorkers();
-        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         model.addAttribute("message", String.format("Операция удаления сотрудника %s выполнена " +
                 "успешно", worker.getName()));
@@ -204,7 +198,7 @@ public class WorkerWebController {
         Worker worker = service.getWorkerById(id);
         service.deleteWorker(worker);
         Collection<Worker> workers = service.getAllWorkers();
-        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         model.addAttribute("message", String.format("Операция удаления сотрудника %s выполнена " +
                 "успешно", worker.getName()));
@@ -220,7 +214,7 @@ public class WorkerWebController {
     @GetMapping("/edit")
     public String edit(Model model) {
         Collection<Worker> workers = service.getAllWorkers();
-        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         return "edit";
     }
@@ -236,7 +230,7 @@ public class WorkerWebController {
     public String editWorker(@ModelAttribute("selected") Long id, Model model) {
         Worker worker = service.getWorkerById(id);
         Collection<Worker> workers = service.getAllWorkers();
-        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         model.addAttribute("worker", worker);
         return "editworker";
@@ -253,7 +247,7 @@ public class WorkerWebController {
     public String eWorker(@PathVariable("id") Long id, Model model) {
         Worker worker = service.getWorkerById(id);
         Collection<Worker> workers = service.getAllWorkers();
-        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         model.addAttribute("worker", worker);
         return "editworker";
@@ -270,7 +264,7 @@ public class WorkerWebController {
     public String saveEditWorker(Model model, Worker worker) {
         service.updateWorker(worker);
         Collection<Worker> workers = service.getAllWorkers();
-        model.addAttribute("estimatedDate", estimatedDate);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         model.addAttribute("message", String.format("Операция редактирования сотрудника %s выполнена " +
                 "успешно", worker.getName()));
@@ -286,16 +280,16 @@ public class WorkerWebController {
      */
     @PostMapping("/upload")
     public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException {
-        if (estimatedDate.getDateForHTML() == "не установлена"){
+        if (EstimatedDate.dateForHTML == "не установлена"){
             Collection<Worker> workers = service.getAllWorkers();
-            model.addAttribute("estimatedDate", estimatedDate);
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
             model.addAttribute("message", "Вы не установили дату расчета");
             return "result";
         }else {
             String message = service.addReportCard(file);
             Collection<Worker> workers = service.getAllWorkers();
-            model.addAttribute("estimatedDate", estimatedDate);
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
             model.addAttribute("message", message);
             return "result";

@@ -15,7 +15,7 @@
         </div>
         <div class="work_date">
             <p>Расчетная дата:</p>
-            <div th:id="work_date" th:text="${estimatedDate.dateForHTML}? ${estimatedDate.dateForHTML} :
+            <div th:id="work_date" th:text="${estimatedDate}? ${estimatedDate} :
             'не установлена'"></div>
         </div>
     </header>
@@ -32,8 +32,8 @@
         <section class="resultfield">
             <div class="h1"><h1>Расчет заработной платы за месяц сотрудникам ИП "Бабайцев В.А."</h1></div>
             <h3>Выберите расчетную дату</h3>
-            <form class="estimated_form" action="#" th:action="@{/inbulk/setworkdate}" th:object="${estimatedDate}" method="post">
-            <input class="date" type="month" th:field="*{dateForDB}" value="">
+            <form class="estimated_form" action="#" th:action="@{/inbulk/setworkdate}"  method="post">
+            <input class="date" type="month" th:value="${estimatedDate}" name="estimatedDate">
                 <button class="button width">
                     Установить
                 </button>

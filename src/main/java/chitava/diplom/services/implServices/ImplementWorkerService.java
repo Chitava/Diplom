@@ -223,7 +223,7 @@ public class ImplementWorkerService implements WorkerService {
                         String fullTime = String.valueOf(row.getCell(j));
                         addTime(fullTime);
                     }
-                    System.out.println(worker.getName());
+
                 } catch (NumberFormatException e) {
                     for (int j = 3; j < lastCell - 1; j++) {
                         String fullTime = String.valueOf(row.getCell(j));
