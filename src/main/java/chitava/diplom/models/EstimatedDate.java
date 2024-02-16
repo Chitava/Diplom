@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 public class EstimatedDate {
 
     //region поля
-    private String dateForHTML;
-    private String dateForDB;
+    public static String dateForHTML;
+    public static String dateForDB;
 
     public EstimatedDate() {
         this.dateForHTML = "не установлена";

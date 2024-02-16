@@ -2,6 +2,7 @@ package chitava.diplom.services.implServices;
 
 import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
+import chitava.diplom.repositorys.WorkedHourRepository;
 import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -19,8 +20,10 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ImplementWorkedHoursService {
-    private Worker worker;
-    private WorkerService workerService;
-    private WorkedHours workedHours;
+   private  WorkedHourRepository repository;
+
+   public void createTable(String name){
+      repository.createTable(name);
+   }
 
 }

@@ -55,7 +55,13 @@ public interface WorkerService {
      */
     String getHollydays(String year);
 
-    String addWorker(MultipartFile file) throws IOException;
+    /**
+     * Метод добавление новых данных о посещении сотрудников
+     * @param file файл с данными
+     * @return
+     * @throws IOException
+     */
+    String addReportCard(MultipartFile file) throws IOException;
 
 
 

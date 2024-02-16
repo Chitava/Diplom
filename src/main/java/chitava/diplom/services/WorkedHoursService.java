@@ -4,8 +4,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface WorkedHoursService {
 
-    void addTime(String times);
-    String addWorkedHours(MultipartFile file);
-
+    void createTable(String name);
 
 }

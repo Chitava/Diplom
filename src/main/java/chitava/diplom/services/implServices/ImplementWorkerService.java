@@ -18,6 +18,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -26,6 +27,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import static chitava.diplom.models.Hollydays.yearHolidays;
 
 
@@ -187,7 +189,14 @@ public class ImplementWorkerService implements WorkerService {
         return null;
     }
 
-    public String addWorker(MultipartFile file) throws IOException {
+    /**
+     * Метод добавление новых данных о посещении сотрудников
+     *
+     * @param file файл с данными
+     * @return
+     * @throws IOException
+     */
+    public String addReportCard(MultipartFile file) throws IOException {
         int count = 0;
         try {
             POIFSFileSystem pSystem = new POIFSFileSystem(file.getInputStream());
@@ -220,11 +229,9 @@ public class ImplementWorkerService implements WorkerService {
                         String fullTime = String.valueOf(row.getCell(j));
                         addTime(fullTime);
                     }
-                }for (LocalTime time: workedHours.getWorkedHours()) {
-                    System.out.print(time + " ч. ");
                 }
             }
-            if (count > 0){
+            if (count > 0) {
                 switch (count) {
                     case 1:
                         return "Новые данные о сотрудниках загружены успешно, У Вас новый сотрудник";
@@ -236,12 +243,12 @@ public class ImplementWorkerService implements WorkerService {
                         return "Новые данные о сотрудниках загружены успешно, У Вас 4 новых сотрудника";
                     default:
                         return String.format("Новые данные о сотрудниках загружены успешно, У Вас %s новых " +
-                                        "сотрудников", count);
+                                "сотрудников", count);
                 }
-            }else {
+            } else {
                 return "Новые данные о сотрудниках загружены успешно";
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             return "В процессе добавления новых сотрудников произошла ошибка " + e.getMessage();
         }
     }
@@ -255,7 +262,4 @@ public class ImplementWorkerService implements WorkerService {
             workedHours.addTime(time);
         }
     }
-
-
-
 }

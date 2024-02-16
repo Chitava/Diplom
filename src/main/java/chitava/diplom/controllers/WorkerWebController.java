@@ -3,14 +3,8 @@ package chitava.diplom.controllers;
 import chitava.diplom.models.EstimatedDate;
 import chitava.diplom.models.Hollydays;
 import chitava.diplom.models.Worker;
-import chitava.diplom.services.WorkedHoursService;
 import chitava.diplom.services.WorkerService;
-import chitava.diplom.services.implServices.ImplementWorkerService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +13,12 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
- * Класс обработчик HTTP запросов
+ * Класс обработчик HTTP запросов работы с записями сотрудников
  */
 @Controller
 @RequestMapping("/inbulk")
 @AllArgsConstructor
-public class WebController {
+public class WorkerWebController {
     /**
      * Сервис для работы с записями сотрудников
      */
@@ -185,7 +179,7 @@ public class WebController {
      *
      * @param id    идентификатор сотрудника
      * @param model Создаем новую модель для новой страницы
-     * @return страницу с рзультатом операции по добавлению нового сотрудника
+     * @return страницу с результатом операции по удалению сотрудника
      */
     @PostMapping("/delworker")
     public String deleteWorker(@ModelAttribute("selected") Long id, Model model) {
@@ -199,7 +193,12 @@ public class WebController {
         return "result";
     }
 
-
+    /**
+     * Метод обработки удаления через GET запрос
+     * @param id идентификатор сотрудника
+     * @param model Создаем новую модель для новой страницы
+     * @return страницу с результатом операции по удалению сотрудника
+     */
     @GetMapping("/delw/{id}")
     public String getDelWorker(@PathVariable Long id, Model model){
         Worker worker = service.getWorkerById(id);
@@ -209,7 +208,6 @@ public class WebController {
         model.addAttribute("workers", workers);
         model.addAttribute("message", String.format("Операция удаления сотрудника %s выполнена " +
                 "успешно", worker.getName()));
-
         return "result";
     }
 
@@ -295,7 +293,7 @@ public class WebController {
             model.addAttribute("message", "Вы не установили дату расчета");
             return "result";
         }else {
-            String message = service.addWorker(file);
+            String message = service.addReportCard(file);
             Collection<Worker> workers = service.getAllWorkers();
             model.addAttribute("estimatedDate", estimatedDate);
             model.addAttribute("workers", workers);
