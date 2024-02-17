@@ -289,3 +289,54 @@ header{
     display: flex;
     justify-content:center;
 }
+
+/*Стили для страницы расчета заработной платы*/
+
+.table__border {
+  width: 55vw;
+  margin-left: 20px;
+}
+
+.table {
+  border-radius: 16px;
+  width: 100%;
+  margin-right: 100px;
+  font-family: "Comforta";
+  border-radius: 10px;
+  background-color: #ffffff;
+  border-spacing: 0px;
+  border-collapse: separate;
+}
+
+thead tr {
+  border-collapse: separate;
+  font-family: "Comforta";
+  font-weight: bold;
+  font-size: 14px;
+  border-radius: 16px;
+}
+
+thead th {
+  height: 50px;
+  column-fill: auto;
+}
+
+td {
+  height: 58px;
+}
+
+.all__buttons {
+  margin-top: 20px;
+}
+
+.recalculation {
+  width: 50px;
+}
+
+.recalculation__button {
+  width: 100px;
+  height: 25px;
+  align-items: center;
+  font-size: 10px;
+  padding: 0 0;
+}

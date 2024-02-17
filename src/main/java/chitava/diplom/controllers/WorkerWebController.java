@@ -2,9 +2,12 @@ package chitava.diplom.controllers;
 
 import chitava.diplom.models.EstimatedDate;
 import chitava.diplom.models.Hollydays;
+import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
 import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +20,16 @@ import java.util.Collection;
  */
 @Controller
 @RequestMapping("/inbulk")
-@AllArgsConstructor
+
+@RequiredArgsConstructor
 public class WorkerWebController {
     /**
      * Сервис для работы с записями сотрудников
      */
+
     private final WorkerService service;
+
+    private final WorkedHours workedHours;
 
     /**
      * Обработка запроса на стартовую страницу
@@ -295,6 +302,18 @@ public class WorkerWebController {
             return "result";
         }
     }
+
+    @GetMapping("/calcall")
+    public String allWorkersSallary(Model model){
+
+
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("workers", workers);
+
+        return "allsallary";
+    }
+
 
 
 }

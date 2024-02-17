@@ -1,5 +1,7 @@
 package chitava.diplom.services;
+import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Collection;
@@ -7,6 +9,7 @@ import java.util.Collection;
 /**
  * Интерфейс для работы с классом сотрудников в базе данных
  */
+@Service
 public interface WorkerService {
     /**
      * Метод получения всех сотрудников
@@ -62,6 +65,11 @@ public interface WorkerService {
      * @throws IOException
      */
     String addReportCard(MultipartFile file) throws IOException;
+
+    void createTable(String name);
+
+    void addWorkedTimes (WorkedHours data, String tableName);
+
 
 
 

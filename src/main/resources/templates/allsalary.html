@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:insert= "~{index :: head}"></head>
+<body>
+  <div th:insert= "~{index :: header}"></div>
+  <main class="workfield">
+    <div th:insert= "~{index :: menu}"></div>
+    <section class="resultfield">
+      <div class="h1">
+        <h1>Зарплата за estimatedata</h1>
+      </div>
+      <div class="table__border">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>ФИО</th>
+            <th>Отработано в месяце дней</th>
+            <th>Дней с переработкой</th>
+            <th>Зарплата за полные дни</th>
+            <th>Зарплата за переработку</th>
+            <th>Аванс</th>
+            <th>Итого за месяц</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="a: ${allSallary}" th:href="@{'/inbulk/worker/' + ${w.id}}">
+            <td th:text="${a.name}"></td>
+            <td th:text="${a.days}"></td>
+            <td th:text="${a.overTime}"></td>
+            <td th:text="${a.sallary}"><span> p.</span></td>
+            <td th:text="${a.overSallary}"><span> р.</span></td>
+            <form action="" method="post">
+              <td th:text="${avans}">
+                <input class="recalculation" /><span> р.</span>
+              </td>
+              <td th:text="${a.fullSalary}"><span> р.</span></td>
+              <td>
+                <button class="button recalculation__button" type="submit">
+                  Пересчитать
+                </button>
+              </td>
+            </form>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <section class="all__buttons">
+        <a href="" class="button"> Сохранить </a>
+        <a href="" class="button">Распечатать</a>
+      </section>
+    </section>
+    <div th:insert= "~{index :: workersmenu}"></div>
+  </main>
+</body>
+</html>

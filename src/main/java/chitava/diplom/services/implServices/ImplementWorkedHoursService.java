@@ -27,7 +27,7 @@ public class ImplementWorkedHoursService implements WorkedHoursService {
 
 
     @Override
-    public void createTable(String name) {
-        repository.createTable(name);
+    public String createTable(String name) {
+        return repository.createTable(name);
     }
 }
