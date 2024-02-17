@@ -1,6 +1,7 @@
 package chitava.diplom.services.implServices;
 
 import chitava.diplom.models.*;
+import chitava.diplom.repositorys.HoursRepository;
 import chitava.diplom.repositorys.WorkersRepository;
 import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -18,9 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -40,8 +38,11 @@ public class ImplementWorkerService implements WorkerService {
 
 
     private Worker worker;
-    @Autowired
     private WorkedHours workedHours;
+
+
+    @Autowired
+    public HoursRepository hoursRepository;
 
     /**
      * Интерфейс для работы с базой данных
@@ -51,7 +52,6 @@ public class ImplementWorkerService implements WorkerService {
 
     @Autowired
     private JdbcTemplate jt;
-
 
     /**
      * Метод получения всех сотрудников
@@ -198,19 +198,19 @@ public class ImplementWorkerService implements WorkerService {
      * @return
      * @throws IOException
      */
-    public String addReportCard(MultipartFile file) throws IOException {
+    public String addReportCard(MultipartFile file){
         int count = 0;
         try {
             POIFSFileSystem pSystem = new POIFSFileSystem(file.getInputStream());
             HSSFWorkbook hb = new HSSFWorkbook(pSystem);
             HSSFSheet sheet = hb.getSheetAt(0);
             int lastrow = sheet.getLastRowNum();
-            for (int i = 0; i < lastrow+1; i++) {
+            for (int i = 0; i < lastrow + 1; i++) {
                 Row row = sheet.getRow(i);
                 int lastCell = row.getLastCellNum();
                 try {
                     Integer.parseInt(String.valueOf(row.getCell(0)));
-                    String workerName = String.valueOf(row.getCell(1)).replace("\n", " ");
+                    String workerName = String.valueOf(row.getCell(1)).replace("\n", "");
                     worker = findByName(workerName);
                     if (worker == null) {
                         worker = new Worker();
@@ -220,7 +220,7 @@ public class ImplementWorkerService implements WorkerService {
                         count++;
                     }
                     workedHours = new WorkedHours();
-                    workedHours.setWorkerName(worker.getName());
+                    workedHours.setWorker(worker);
                     for (int j = 3; j < lastCell - 1; j++) {
                         String fullTime = String.valueOf(row.getCell(j));
                         addTime(fullTime);
@@ -229,20 +229,8 @@ public class ImplementWorkerService implements WorkerService {
                     for (int j = 3; j < lastCell - 1; j++) {
                         String fullTime = String.valueOf(row.getCell(j));
                         addTime(fullTime);
-                    }
+                    }hoursRepository.save(workedHours);
                 }
-            }
-            try {
-                createTable(EstimatedDate.dateForDB);
-            }catch (Exception e) {
-                return String.format("В поцессе создания таблицы со временем посещений произошла ошибка %s",
-                        e.getMessage());
-            }
-            try {
-                addWorkedTimes(workedHours, EstimatedDate.dateForDB);
-            }catch (Exception e){
-                return String.format("В поцессе добавление данных о посещении сотрудника %s произошла ошибка %s",
-                        worker.getName(), e.getMessage());
             }
             if (count > 0) {
                 switch (count) {
@@ -268,6 +256,7 @@ public class ImplementWorkerService implements WorkerService {
 
     /**
      * Метод парсинга времени из файла с данными о посещения сотрудников
+     *
      * @param times Время посещения за день
      */
     public void addTime(String times) {
@@ -277,40 +266,13 @@ public class ImplementWorkerService implements WorkerService {
             int hour = Integer.parseInt(str[2].substring(0, str[2].indexOf(":")));
             int minute = Integer.parseInt(str[2].substring(str[2].indexOf(":") + 1));
             time = LocalTime.of(hour, minute);
-        }else {
-            time = LocalTime.of(0,0);
-        }workedHours.addTime(time);
+        } else {
+            time = LocalTime.of(0, 0);
+        }
+        workedHours.setTimes(time);
     }
 
 
-    public void createTable(String name) {
-        String query = "create table "+ name +" (name VARCHAR(100), a VARCHAR(8), b VARCHAR(8), c VARCHAR(8), d VARCHAR(8), " +
-                "e VARCHAR(8), f VARCHAR(8), g VARCHAR(8), h VARCHAR(8), i VARCHAR(8), j VARCHAR(8), k VARCHAR(8), l VARCHAR(8), " +
-                "m VARCHAR(8), n VARCHAR(8), o VARCHAR(8), p VARCHAR(8), q VARCHAR(8), r VARCHAR(8), s VARCHAR(8), t VARCHAR(8), " +
-                "u VARCHAR(8), v VARCHAR(8), w VARCHAR(8), x VARCHAR(8), y VARCHAR(8), z VARCHAR(8), aa VARCHAR(8), ab VARCHAR(8), " +
-                "ac VARCHAR(8) , ad VARCHAR(8), ae VARCHAR(8), af VARCHAR(8));";
-
-        try {
-            jt.execute(query);
-        }catch (Exception e){
-            throw new RuntimeException(e.getMessage());
-        }
-    }
 
 
-    public void addWorkedTimes (WorkedHours data, String tableName){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Insert into " + tableName + " (name, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, " +
-                "r, s, t, u, v, w, x, y, z, aa, ab, ac, ad, ae, af) values ('"  + data.getWorkerName() + "', ");
-        for (LocalTime time: data.getWorkedHours()) {
-            stringBuilder.append("'"+time.toString() + "', ");
-        }
-        stringBuilder.deleteCharAt(stringBuilder.lastIndexOf(",")).append(");");
-        String query = String.valueOf(stringBuilder);
-        try {
-            jt.update(query);
-        }catch (Exception e){
-            throw new RuntimeException(e.getMessage());
-        }
-    }
 }

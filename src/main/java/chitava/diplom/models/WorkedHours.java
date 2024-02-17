@@ -1,37 +1,33 @@
 package chitava.diplom.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Data
+@Entity
 @AllArgsConstructor
-@Component
+@NoArgsConstructor
+@Table (name = "hours")
 public class WorkedHours {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(nullable = false)
+    private Long id;
+    @OneToOne(mappedBy = "hours")
+    private Worker worker;
 
-    private String workerName;
+    private List<LocalTime> times = new ArrayList<>();
 
-    private List<LocalTime> workedHours;
-
-    public WorkedHours() {
-        this.workedHours = new ArrayList<>();
+    public LocalTime getTime(int id) {
+        return times.get(id);
     }
 
-    public void addTime(LocalTime time) {
-        this.workedHours.add(time);
-    }
-    public LocalTime getTime(int i){
-        return workedHours.get(i);
+    public void setTimes(LocalTime times) {
+        this.times.add(times);
     }
 }

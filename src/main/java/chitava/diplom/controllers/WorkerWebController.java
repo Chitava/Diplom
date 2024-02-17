@@ -5,9 +5,7 @@ import chitava.diplom.models.Hollydays;
 import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
 import chitava.diplom.services.WorkerService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +27,8 @@ public class WorkerWebController {
 
     private final WorkerService service;
 
-    private final WorkedHours workedHours;
+
+//    private final OneWorkedHours workedHours;
 
     /**
      * Обработка запроса на стартовую страницу

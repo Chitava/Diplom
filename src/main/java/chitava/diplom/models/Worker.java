@@ -35,6 +35,9 @@ public class Worker {
     private double peymentInHollydays;
     private boolean newWorker;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id", referencedColumnName = "id")
+    private WorkedHours hours;
 
     //endregion
 
