@@ -3,6 +3,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 /**
  * Класс сотрудник
  * Сохраняется в базе данных в таблице workers
@@ -35,9 +38,6 @@ public class Worker {
     private double peymentInHollydays;
     private boolean newWorker;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id", referencedColumnName = "id")
-    private WorkedHours hours;
 
     //endregion
 

@@ -1,7 +1,7 @@
 package chitava.diplom.services;
 
 import chitava.diplom.models.Worker;
-import org.springframework.stereotype.Service;
+
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Collection;
@@ -9,7 +9,7 @@ import java.util.Collection;
 /**
  * Интерфейс для работы с классом сотрудников в базе данных
  */
-@Service
+
 public interface WorkerService {
     /**
      * Метод получения всех сотрудников

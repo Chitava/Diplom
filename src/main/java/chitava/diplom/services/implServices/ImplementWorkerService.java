@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Comparator;
@@ -40,15 +41,14 @@ public class ImplementWorkerService implements WorkerService {
     private Worker worker;
     private WorkedHours workedHours;
 
-
-    @Autowired
-    public HoursRepository hoursRepository;
-
     /**
      * Интерфейс для работы с базой данных
      */
     @Autowired
     private WorkersRepository repository;
+
+    @Autowired
+    private HoursRepository hoursRepository;
 
     @Autowired
     private JdbcTemplate jt;
@@ -59,9 +59,9 @@ public class ImplementWorkerService implements WorkerService {
      * @return коллекцию сотрудников
      */
     @Override
-    public Collection<Worker> getAllWorkers() {
+    public List<Worker> getAllWorkers() {
         try {
-            Collection<Worker> workers = repository.findAll();
+            List<Worker> workers = repository.findAll();
             return workers.stream().sorted(Comparator.comparing(Worker::getName)).sorted(Comparator.comparing
                     (Worker::isNewWorker, (s1, s2) -> {
                         return s2.compareTo(s1);
@@ -178,7 +178,7 @@ public class ImplementWorkerService implements WorkerService {
             responce = template.exchange(URL,
                     HttpMethod.GET, entity, Hollydays.class);
         } catch (Exception e) {
-            return "Ошибка подключения к календарю " + e.getMessage();
+            return "Ошибка получения праздничных дней " + e.getMessage();
         }
         yearHolidays.clear();
         Hollydays hollydays = responce.getBody();
@@ -229,7 +229,8 @@ public class ImplementWorkerService implements WorkerService {
                     for (int j = 3; j < lastCell - 1; j++) {
                         String fullTime = String.valueOf(row.getCell(j));
                         addTime(fullTime);
-                    }hoursRepository.save(workedHours);
+                    }
+                    hoursRepository.save(workedHours);
                 }
             }
             if (count > 0) {
@@ -260,14 +261,14 @@ public class ImplementWorkerService implements WorkerService {
      * @param times Время посещения за день
      */
     public void addTime(String times) {
-        LocalTime time;
+        LocalDateTime time;
         if (!times.equals("--\n--\n--") && times.length() != 0) {
             String[] str = times.split("\n");
             int hour = Integer.parseInt(str[2].substring(0, str[2].indexOf(":")));
             int minute = Integer.parseInt(str[2].substring(str[2].indexOf(":") + 1));
-            time = LocalTime.of(hour, minute);
+            time = LocalDateTime.of(2024, 1, 1, hour, minute);
         } else {
-            time = LocalTime.of(0, 0);
+            time = LocalDateTime.of(2024, 1, 1, 0, 0);
         }
         workedHours.setTimes(time);
     }

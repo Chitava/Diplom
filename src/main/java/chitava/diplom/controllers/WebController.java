@@ -4,6 +4,7 @@ import chitava.diplom.models.EstimatedDate;
 import chitava.diplom.models.Hollydays;
 import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
+import chitava.diplom.services.HoursService;
 import chitava.diplom.services.WorkerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -11,7 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Класс обработчик HTTP запросов работы с записями сотрудников
@@ -20,12 +23,13 @@ import java.util.Collection;
 @RequestMapping("/inbulk")
 
 @RequiredArgsConstructor
-public class WorkerWebController {
+public class WebController {
     /**
      * Сервис для работы с записями сотрудников
      */
 
     private final WorkerService service;
+    private final HoursService hoursService;
 
 
 //    private final OneWorkedHours workedHours;
@@ -303,14 +307,22 @@ public class WorkerWebController {
     }
 
     @GetMapping("/calcall")
-    public String allWorkersSallary(Model model){
-
-
+    public String allWorkersSallary(Model model) throws SQLException {
         Collection<Worker> workers = service.getAllWorkers();
-        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
-        model.addAttribute("workers", workers);
+        if (EstimatedDate.dateForHTML == "не установлена") {
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+            model.addAttribute("workers", workers);
+            model.addAttribute("message", "Вы не установили дату расчета");
+            return "result";
+        }else {
+            List<WorkedHours> hours = hoursService.getAll();
+            System.out.println(hours);
+            workers = service.getAllWorkers();
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+            model.addAttribute("workers", workers);
 
-        return "allsallary";
+            return "allsallary";
+        }
     }
 
 

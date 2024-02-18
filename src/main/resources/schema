@@ -1,4 +1,0 @@
-CREATE DATABASE IF NOT EXISTS inbulk;
-USE inbulk;
-
-create table hours (id bigint not null auto_increment, times varbinary(255), primary key (id));
