@@ -314,7 +314,7 @@ public class WebController {
             model.addAttribute("message", "Вы не установили дату расчета");
             return "result";
         }else {
-
+            jdbc.getAllMonthTimes(1l, "salary_2024_02");
             workers = service.getAllWorkers();
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);

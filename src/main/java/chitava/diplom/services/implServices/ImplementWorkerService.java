@@ -225,7 +225,6 @@ public class ImplementWorkerService implements WorkerService {
                     workedHours.setId(worker.getId());
                     if (! jdbc.selectID(worker.getId().toString(), EstimatedDate.dateForDB)){
                         jdbc.insert(EstimatedDate.dateForDB, worker.getId().toString());
-                        //todo переделать логику добавления в зависимоти от наличия id в базе
                     }
                     int number = 1;
                     for (int j = 3; j < lastCell - 1; j++) {
@@ -242,7 +241,6 @@ public class ImplementWorkerService implements WorkerService {
                         jdbc.addTime(EstimatedDate.dateForDB, worker.getId().toString(), number, time);
                         number++;
                     }
-
                 }
             }
             if (count > 0) {
