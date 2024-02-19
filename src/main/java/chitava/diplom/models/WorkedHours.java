@@ -8,19 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table (name = "hours")
 public class WorkedHours {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Long id;
-    @OneToOne
-    @JoinColumn(name = "id")
-    private Worker worker;
 
+    private Long id;
     private List<LocalDateTime> times = new ArrayList<>();
 
     public LocalDateTime getTime(int id) {

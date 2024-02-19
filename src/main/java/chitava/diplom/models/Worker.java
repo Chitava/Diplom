@@ -44,8 +44,6 @@ public class Worker {
     public boolean getPost() {
         return post;
     }
-
-
     public void setPost(boolean post) {
         this.post = post;
     }

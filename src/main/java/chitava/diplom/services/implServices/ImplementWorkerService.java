@@ -1,8 +1,9 @@
 package chitava.diplom.services.implServices;
 
 import chitava.diplom.models.*;
-import chitava.diplom.repositorys.HoursRepository;
+
 import chitava.diplom.repositorys.WorkersRepository;
+import chitava.diplom.services.JDBCService;
 import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -19,8 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,7 +47,9 @@ public class ImplementWorkerService implements WorkerService {
     private WorkersRepository repository;
 
     @Autowired
-    private HoursRepository hoursRepository;
+    JDBCService jdbc;
+
+
 
     @Autowired
     private JdbcTemplate jt;
@@ -199,6 +200,7 @@ public class ImplementWorkerService implements WorkerService {
      * @throws IOException
      */
     public String addReportCard(MultipartFile file){
+        jdbc.createTable(EstimatedDate.dateForDB);
         int count = 0;
         try {
             POIFSFileSystem pSystem = new POIFSFileSystem(file.getInputStream());
@@ -220,17 +222,27 @@ public class ImplementWorkerService implements WorkerService {
                         count++;
                     }
                     workedHours = new WorkedHours();
-                    workedHours.setWorker(worker);
+                    workedHours.setId(worker.getId());
+                    if (! jdbc.selectID(worker.getId().toString(), EstimatedDate.dateForDB)){
+                        jdbc.insert(EstimatedDate.dateForDB, worker.getId().toString());
+                        //todo переделать логику добавления в зависимоти от наличия id в базе
+                    }
+                    int number = 1;
                     for (int j = 3; j < lastCell - 1; j++) {
                         String fullTime = String.valueOf(row.getCell(j));
-                        addTime(fullTime);
+                        LocalDateTime time = addTime(fullTime);
+                        jdbc.addTime(EstimatedDate.dateForDB, worker.getId().toString(), number, time);
+                        number++;
                     }
-                } catch (NumberFormatException e) {
+                }catch (NumberFormatException e) {
+                    int number = 17;
                     for (int j = 3; j < lastCell - 1; j++) {
                         String fullTime = String.valueOf(row.getCell(j));
-                        addTime(fullTime);
+                        LocalDateTime time = addTime(fullTime);
+                        jdbc.addTime(EstimatedDate.dateForDB, worker.getId().toString(), number, time);
+                        number++;
                     }
-                    hoursRepository.save(workedHours);
+
                 }
             }
             if (count > 0) {
@@ -260,7 +272,7 @@ public class ImplementWorkerService implements WorkerService {
      *
      * @param times Время посещения за день
      */
-    public void addTime(String times) {
+    public LocalDateTime addTime(String times) {
         LocalDateTime time;
         if (!times.equals("--\n--\n--") && times.length() != 0) {
             String[] str = times.split("\n");
@@ -271,6 +283,7 @@ public class ImplementWorkerService implements WorkerService {
             time = LocalDateTime.of(2024, 1, 1, 0, 0);
         }
         workedHours.setTimes(time);
+        return time;
     }
 
 
