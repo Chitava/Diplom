@@ -47,12 +47,12 @@ public class JDBCService {
         query.append("CREATE TABLE IF NOT EXISTS ");
         query.append(tableName + " (workerid VARCHAR (100) PRIMARY KEY UNIQUE, ");
         int number = 1;
-        for (int i = 0; i < 31; i++) {
+        for (int i = 0; i < 30; i++) {
             String numberDay = "day" + number;
             number++;
             query.append(numberDay + " DATETIME, ");
         }
-        query.append("day32 DATETIME);");
+        query.append("day31 DATETIME);");
         try {
             getStatment().execute(query.toString());
         } catch (SQLException | ClassNotFoundException e) {

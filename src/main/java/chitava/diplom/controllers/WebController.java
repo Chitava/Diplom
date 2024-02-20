@@ -317,6 +317,7 @@ public class WebController {
             return "result";
         }else {
             allMonthHours = service.getMonthTimes("salary_2024_02");
+
             ArrayList<WorkedHours> list = allMonthHours.getMonthAllHours();
             for (int i = 0; i < list.size(); i++) {
                 service.salaryCalculation(list.get(i));

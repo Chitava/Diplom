@@ -229,13 +229,12 @@ public class ImplementWorkerService implements WorkerService {
                         jdbc.insert(EstimatedDate.dateForDB, worker.getId().toString());
                     }
 
-                    for (int j = 3; j < lastCell - 1; j++) {
+                    for (int j = 3; j < lastCell - 2; j++) {
                         String fullTime = String.valueOf(row.getCell(j));
                         LocalDateTime time = addTime(fullTime, number);
-                        System.out.println(time);
-                        if (time == null) {
-                            //todo разобраться с 32 днями
-                            number++;
+                        System.out.println(number);
+                        System.out.println(fullTime);
+                        if (time.equals("")) {
                             break;
                         } else {
                             jdbc.addTime(EstimatedDate.dateForDB, worker.getId().toString(), number, time);
@@ -245,6 +244,10 @@ public class ImplementWorkerService implements WorkerService {
                 } catch (NumberFormatException e) {
                     for (int j = 3; j < lastCell - 1; j++) {
                         String fullTime = String.valueOf(row.getCell(j));
+                        System.out.println(number);
+                        System.out.println(fullTime);
+
+
                         LocalDateTime time = addTime(fullTime, number);
                         jdbc.addTime(EstimatedDate.dateForDB, worker.getId().toString(), number, time);
                         number++;
@@ -331,21 +334,81 @@ public class ImplementWorkerService implements WorkerService {
         String monthYears = new StringBuilder(".").append(temp[1]).append(".").append(temp[0]).toString();
         Worker worker = hours.getWorker();
         List<LocalDateTime> hour = hours.getTimes();
-        String verificationDays = "";
+        String verificationDays = ""; //переменная для проверки выходной или нет
+        int workDays = 0;
+        int overDays = 0;
+        double sallary = 0;
+        double overSallary = 0;
+        double fullSalary = 0;
         for (int i = 0; i < hour.size(); i++) {
-            System.out.println(hour.get(i));
-            System.out.println(hour.get(i).getDayOfWeek());
             String day = String.valueOf(i + 1);
             if (i < 10) {
                 verificationDays = "0" + day + monthYears;
             } else {
                 verificationDays = day + monthYears;
             }
-            if (yearHolidays.contains(verificationDays)) {
-                System.out.println("Выходной " + verificationDays);
+            double dayTime= 0;
+            String dayHour = String.valueOf(hour.get(i).getHour());
+            String dayMinute = String.valueOf(hour.get(i).getMinute());
+            if (hour.get(i).getMinute() < 10) {
+                dayTime = Double.parseDouble(dayHour + ".0" + dayMinute);
+            }else {
+                dayTime = Double.parseDouble(dayHour + "." + dayMinute);
             }
+            if (dayTime > 1){
+                if (worker.getPost()) {
+                    if (yearHolidays.contains(verificationDays) || String.valueOf(hour.get(i).getDayOfWeek()) == "SATURDAY"
+                            || String.valueOf(hour.get(i).getDayOfWeek()) == "SUNDAY") {
+                        System.out.println("Выходной " + verificationDays);
+                        //зп в выходной руководителя
+                    } else {
+                        //зп в рабочий день
+                    }
+                }else {
+                workDays++;
+                sallary = sallary + worker.getPaymentInDay()*(dayTime-1);
+                if (dayTime > 9){
+                    overSallary = (dayTime-9)*worker.getPaymentInHour();
+                    overDays++;
+                }
+
+
+                    //зп в рабочий день
+                }
+            }
+
+
+
+
+
+
+
+/
         }
-        return null;
+        return new MonthSalary(worker.getId(), worker.getName(), workDays, overDays, sallary, overSallary, 0,
+                fullSalary);
     }
 
+
+    private MonthSalary sallary (Worker worker, List<LocalDateTime> hour){
+
+        double paymentInDay = worker.getPaymentInDay();
+        double paymentInHour = worker.getPaymentInHour();
+        int workDays = 0;
+        int overDays = 0;
+        double sallary = 0;
+        double overSallary = 0;
+        double prepayment = 0;
+        double fullSalary = 0;
+
+        for (int i = 0; i < hour.size(); i++) {
+            LocalDateTime data = hour.get(i);
+            LocalTime time = LocalTime.from(data);
+            System.out.println(time);
+
+        }
+
+
+        return null;
+    }
 }
