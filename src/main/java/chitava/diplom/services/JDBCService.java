@@ -68,7 +68,7 @@ public class JDBCService {
     public void insert(String tableName, String workerid) {
         String query = "Insert into " + tableName + "(workerid) VALUE (" + workerid + ");";
         try {
-            getStatment().executeQuery(query);
+            getStatment().executeUpdate(query);
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -93,7 +93,7 @@ public class JDBCService {
                 .append(workerid)
                 .append(";");
         try {
-            getStatment().execute(query.toString());
+            getStatment().executeUpdate(String.valueOf(query));
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

@@ -16,6 +16,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -39,7 +40,9 @@ public class ImplementWorkerService implements WorkerService {
 
     private Worker worker;
     private WorkedHours workedHours;
+    @Autowired
     private MonthAllWorkersHours monthAllWorkersHours;
+
 
     /**
      * Интерфейс для работы с базой данных
@@ -196,7 +199,7 @@ public class ImplementWorkerService implements WorkerService {
      * @return
      * @throws IOException
      */
-    public String addReportCard(MultipartFile file){
+    public String addReportCard(MultipartFile file) {
         jdbc.createTable(EstimatedDate.dateForDB);
         int count = 0;
         try {
@@ -204,6 +207,7 @@ public class ImplementWorkerService implements WorkerService {
             HSSFWorkbook hb = new HSSFWorkbook(pSystem);
             HSSFSheet sheet = hb.getSheetAt(0);
             int lastrow = sheet.getLastRowNum();
+            int number = 1;
             for (int i = 0; i < lastrow + 1; i++) {
                 Row row = sheet.getRow(i);
                 int lastCell = row.getLastCellNum();
@@ -221,21 +225,27 @@ public class ImplementWorkerService implements WorkerService {
                     workedHours = new WorkedHours();
                     workedHours.setWorker(worker);
                     monthAllWorkersHours.addWorkedHours(workedHours);
-                    if (! jdbc.selectID(worker.getId().toString(), EstimatedDate.dateForDB)){
+                    if (!jdbc.selectID(worker.getId().toString(), EstimatedDate.dateForDB)) {
                         jdbc.insert(EstimatedDate.dateForDB, worker.getId().toString());
                     }
-                    int number = 1;
+
                     for (int j = 3; j < lastCell - 1; j++) {
                         String fullTime = String.valueOf(row.getCell(j));
-                        LocalDateTime time = addTime(fullTime);
-                        jdbc.addTime(EstimatedDate.dateForDB, worker.getId().toString(), number, time);
-                        number++;
+                        LocalDateTime time = addTime(fullTime, number);
+                        System.out.println(time);
+                        if (time == null) {
+                            //todo разобраться с 32 днями
+                            number++;
+                            break;
+                        } else {
+                            jdbc.addTime(EstimatedDate.dateForDB, worker.getId().toString(), number, time);
+                            number++;
+                        }
                     }
-                }catch (NumberFormatException e) {
-                    int number = 17;
+                } catch (NumberFormatException e) {
                     for (int j = 3; j < lastCell - 1; j++) {
                         String fullTime = String.valueOf(row.getCell(j));
-                        LocalDateTime time = addTime(fullTime);
+                        LocalDateTime time = addTime(fullTime, number);
                         jdbc.addTime(EstimatedDate.dateForDB, worker.getId().toString(), number, time);
                         number++;
                     }
@@ -268,9 +278,9 @@ public class ImplementWorkerService implements WorkerService {
      *
      * @param times Время посещения за день
      */
-    public LocalDateTime addTime(String times) {
+    public LocalDateTime addTime(String times, int day) {
         LocalDateTime time = null;
-        if (!times.equals("--\n--\n--") && times.length() != 0) {
+        if (!times.equals("--\n--\n--") && times.length() > 0) {
             String[] str = times.split("\n");
             int comeHour = Integer.parseInt(str[0].substring(0, str[0].indexOf(":")));
             int comeMinute = Integer.parseInt(str[0].substring(str[0].indexOf(":") + 1));
@@ -284,14 +294,14 @@ public class ImplementWorkerService implements WorkerService {
                         .minusMinutes(comeMinute)
                         .plusHours(leftHour)
                         .plusMinutes(leftMinute);
-                time = LocalDateTime.of(2024, 1, 1, addTime.getHour(), addTime.getMinute());
-            }else {
+                time = LocalDateTime.of(2024, 1, day, addTime.getHour(), addTime.getMinute());
+            } else {
                 int hour = Integer.parseInt(str[2].substring(0, str[2].indexOf(":")));
                 int minute = Integer.parseInt(str[2].substring(str[2].indexOf(":") + 1));
-                time = LocalDateTime.of(2024, 1, 1, hour, minute);
+                time = LocalDateTime.of(2024, 1, day, hour, minute);
             }
         } else {
-            time = LocalDateTime.of(2024, 1, 1, 0, 0);
+            time = LocalDateTime.of(2024, 1, day, 0, 0);
         }
         workedHours.addTime(time);
         return time;
@@ -299,20 +309,43 @@ public class ImplementWorkerService implements WorkerService {
 
     /**
      * Метод получения данных посещений всех сотрудников за определеннный месяц
+     *
      * @param tableName
      * @return
      */
-    public MonthAllWorkersHours getMonthTimes(String tableName){
+    public MonthAllWorkersHours getMonthTimes(String tableName) {
         monthAllWorkersHours = new MonthAllWorkersHours();
         ArrayList<Long> ids = jdbc.selectAllIdInMonth(tableName);
         WorkedHours monthTimes = new WorkedHours();
-        for (Long id: ids) {
+        for (Long id : ids) {
             Worker worker = repository.findById(id).get();
             monthTimes.setWorker(worker);
             monthTimes = jdbc.getAllMonthTimes(worker, tableName);
             monthAllWorkersHours.addWorkedHours(monthTimes);
         }
         return monthAllWorkersHours;
+    }
+
+    public MonthSalary salaryCalculation(WorkedHours hours) {
+        String[] temp = new StringBuilder(EstimatedDate.dateForDB.replace("salary_", "")).toString().split("_");
+        String monthYears = new StringBuilder(".").append(temp[1]).append(".").append(temp[0]).toString();
+        Worker worker = hours.getWorker();
+        List<LocalDateTime> hour = hours.getTimes();
+        String verificationDays = "";
+        for (int i = 0; i < hour.size(); i++) {
+            System.out.println(hour.get(i));
+            System.out.println(hour.get(i).getDayOfWeek());
+            String day = String.valueOf(i + 1);
+            if (i < 10) {
+                verificationDays = "0" + day + monthYears;
+            } else {
+                verificationDays = day + monthYears;
+            }
+            if (yearHolidays.contains(verificationDays)) {
+                System.out.println("Выходной " + verificationDays);
+            }
+        }
+        return null;
     }
 
 }

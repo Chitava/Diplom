@@ -1,6 +1,8 @@
 package chitava.diplom.services;
 
 import chitava.diplom.models.MonthAllWorkersHours;
+import chitava.diplom.models.MonthSalary;
+import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -73,6 +75,7 @@ public interface WorkerService {
      * @return
      */
     public MonthAllWorkersHours getMonthTimes(String tableName);
+    public MonthSalary salaryCalculation (WorkedHours hours);
 
 
 

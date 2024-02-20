@@ -80,7 +80,8 @@ public class WebController {
             String message = service.getHollydays(year);
             if (message == null) {
                 model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
-                return "index";
+                model.addAttribute("message", "Дата расчета установлена " + EstimatedDate.dateForHTML);
+                return "result";
             } else {
                 model.addAttribute("message", message);
                 return "result";
@@ -316,9 +317,9 @@ public class WebController {
             return "result";
         }else {
             allMonthHours = service.getMonthTimes("salary_2024_02");
-            ArrayList list = allMonthHours.getMonthAllHours();
+            ArrayList<WorkedHours> list = allMonthHours.getMonthAllHours();
             for (int i = 0; i < list.size(); i++) {
-                System.out.println(list.get(i));
+                service.salaryCalculation(list.get(i));
             }
 
             workers = service.getAllWorkers();
