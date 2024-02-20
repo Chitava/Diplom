@@ -1,8 +1,6 @@
 package chitava.diplom.controllers;
 
-import chitava.diplom.models.EstimatedDate;
-import chitava.diplom.models.Hollydays;
-import chitava.diplom.models.Worker;
+import chitava.diplom.models.*;
 import chitava.diplom.services.JDBCService;
 import chitava.diplom.services.WorkerService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -29,6 +29,7 @@ public class WebController {
 
     private final WorkerService service;
     private final JDBCService jdbc;
+    private MonthAllWorkersHours allMonthHours;
 
 
 //    private final OneWorkedHours workedHours;
@@ -314,7 +315,12 @@ public class WebController {
             model.addAttribute("message", "Вы не установили дату расчета");
             return "result";
         }else {
-            jdbc.getAllMonthTimes(1l, "salary_2024_02");
+            allMonthHours = service.getMonthTimes("salary_2024_02");
+            ArrayList list = allMonthHours.getMonthAllHours();
+            for (int i = 0; i < list.size(); i++) {
+                System.out.println(list.get(i));
+            }
+
             workers = service.getAllWorkers();
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);

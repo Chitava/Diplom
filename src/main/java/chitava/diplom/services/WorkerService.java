@@ -1,5 +1,6 @@
 package chitava.diplom.services;
 
+import chitava.diplom.models.MonthAllWorkersHours;
 import chitava.diplom.models.Worker;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -66,7 +67,12 @@ public interface WorkerService {
      */
     String addReportCard(MultipartFile file) throws IOException;
 
-
+    /**
+     * Метод получения лданных о посещении за определенный месяц
+     * @param tableName
+     * @return
+     */
+    public MonthAllWorkersHours getMonthTimes(String tableName);
 
 
 

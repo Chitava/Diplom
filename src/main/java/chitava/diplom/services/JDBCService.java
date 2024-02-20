@@ -1,12 +1,14 @@
 package chitava.diplom.services;
 
 
+import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.mapping.List;
 import org.springframework.stereotype.Service;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 /**
  * Класс работы с SQL базой
@@ -19,6 +21,12 @@ public class JDBCService {
     private static Statement statment;
     private static ResultSet result;
 
+    /**
+     * Метод получения соединения с БД
+     * @return
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
     public Statement getStatment() throws ClassNotFoundException, SQLException {
         String URL = "jdbc:mysql://localhost:3306/mysql";
         String USER = "root";
@@ -30,6 +38,10 @@ public class JDBCService {
         return statment;
     }
 
+    /**
+     * Метод создание таблицы в зависимости от месяца расчета
+     * @param tableName
+     */
     public void createTable(String tableName) {
         StringBuilder query = new StringBuilder();
         query.append("CREATE TABLE IF NOT EXISTS ");
@@ -48,6 +60,11 @@ public class JDBCService {
         }
     }
 
+    /**
+     * Метод добавления идентификатора сотрудника в таблицу с данными посещения
+     * @param tableName
+     * @param workerid
+     */
     public void insert(String tableName, String workerid) {
         String query = "Insert into " + tableName + "(workerid) VALUE (" + workerid + ");";
         try {
@@ -57,6 +74,13 @@ public class JDBCService {
         }
     }
 
+    /**
+     * Метод добавления данных посещения
+     * @param tableName
+     * @param workerid
+     * @param number
+     * @param time
+     */
     public void addTime(String tableName, String workerid, int number, LocalDateTime time) {
         StringBuilder query = new StringBuilder();
         query.append("UPDATE ")
@@ -75,6 +99,13 @@ public class JDBCService {
         }
     }
 
+
+    /**
+     * Метод проверки наличия сотрудника с номером в базе данных
+     * @param id
+     * @param tableName
+     * @return
+     */
     public boolean selectID(String id, String tableName) {
         String query = "select workerid from " + tableName + " where workerid = " + id + ";";
         try {
@@ -89,28 +120,47 @@ public class JDBCService {
         return false;
     }
 
-    public Worker getAllMonthTimes (Long worker, String tableName){
 
-        String query = "SELECT * FROM " + tableName + " WHERE workerid = "+ worker + ";";
-//        String query = "SELECT * FROM " + tableName + " WHERE workerid = "
-//                + worker.getId() + ";";
+    public ArrayList<Long> selectAllIdInMonth(String tableName) {
+        String queryForId = "select workerid from " + tableName + ";";
+        ArrayList<Long> monthId= new ArrayList<>();
 
         try {
-            result = getStatment().executeQuery(query);
+            result = getStatment().executeQuery(queryForId);
             while(result.next()) {
-                for (int i = 2; i < 33; i++) {
-                    LocalDateTime time = LocalDateTime.parse(result.getString(i).replace(" ",  "T"));
-                    System.out.println(time);
-//todo доделать метод получения данных посещения
-                }
-
+                monthId.add(Long.valueOf(result.getString(1)));
             }
         } catch (
                 SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+        return monthId;
+    }
 
-        return null;
+
+    /**
+     * Метод получения всех данных определенного сотрудника из таблицы с данными посещения за определенный месяц
+     * @param worker
+     * @param tableName
+     * @return
+     */
+    public WorkedHours getAllMonthTimes (Worker worker, String tableName){
+        String query = "SELECT * FROM " + tableName + " WHERE workerid = "+ worker.getId().toString() + ";";
+        WorkedHours hours = new WorkedHours();
+        hours.setWorker(worker);
+        try {
+            result = getStatment().executeQuery(query);
+            while(result.next()) {
+                for (int i = 2; i < 33; i++) {
+                    LocalDateTime time = LocalDateTime.parse(result.getString(i).replace(" ",  "T"));
+                    hours.addTime(time);
+                }
+            }
+        } catch (
+                SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return hours;
     }
 }
 

@@ -13,13 +13,13 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +39,7 @@ public class ImplementWorkerService implements WorkerService {
 
     private Worker worker;
     private WorkedHours workedHours;
+    private MonthAllWorkersHours monthAllWorkersHours;
 
     /**
      * Интерфейс для работы с базой данных
@@ -49,10 +50,6 @@ public class ImplementWorkerService implements WorkerService {
     @Autowired
     JDBCService jdbc;
 
-
-
-    @Autowired
-    private JdbcTemplate jt;
 
     /**
      * Метод получения всех сотрудников
@@ -222,7 +219,8 @@ public class ImplementWorkerService implements WorkerService {
                         count++;
                     }
                     workedHours = new WorkedHours();
-                    workedHours.setId(worker.getId());
+                    workedHours.setWorker(worker);
+                    monthAllWorkersHours.addWorkedHours(workedHours);
                     if (! jdbc.selectID(worker.getId().toString(), EstimatedDate.dateForDB)){
                         jdbc.insert(EstimatedDate.dateForDB, worker.getId().toString());
                     }
@@ -271,20 +269,50 @@ public class ImplementWorkerService implements WorkerService {
      * @param times Время посещения за день
      */
     public LocalDateTime addTime(String times) {
-        LocalDateTime time;
+        LocalDateTime time = null;
         if (!times.equals("--\n--\n--") && times.length() != 0) {
             String[] str = times.split("\n");
-            int hour = Integer.parseInt(str[2].substring(0, str[2].indexOf(":")));
-            int minute = Integer.parseInt(str[2].substring(str[2].indexOf(":") + 1));
-            time = LocalDateTime.of(2024, 1, 1, hour, minute);
+            int comeHour = Integer.parseInt(str[0].substring(0, str[0].indexOf(":")));
+            int comeMinute = Integer.parseInt(str[0].substring(str[0].indexOf(":") + 1));
+            int leftHour = Integer.parseInt(str[1].substring(0, str[1].indexOf(":")));
+            int leftMinute = Integer.parseInt(str[1].substring(str[1].indexOf(":") + 1));
+            LocalTime comeWork = LocalTime.of(comeHour, comeMinute);
+            LocalTime leftWork = LocalTime.of(leftHour, leftMinute);
+            if (comeWork.compareTo(leftWork) > 0) {
+                LocalTime fullDay = LocalTime.of(00, 00);
+                LocalTime addTime = fullDay.minusHours(comeHour)
+                        .minusMinutes(comeMinute)
+                        .plusHours(leftHour)
+                        .plusMinutes(leftMinute);
+                time = LocalDateTime.of(2024, 1, 1, addTime.getHour(), addTime.getMinute());
+            }else {
+                int hour = Integer.parseInt(str[2].substring(0, str[2].indexOf(":")));
+                int minute = Integer.parseInt(str[2].substring(str[2].indexOf(":") + 1));
+                time = LocalDateTime.of(2024, 1, 1, hour, minute);
+            }
         } else {
             time = LocalDateTime.of(2024, 1, 1, 0, 0);
         }
-        workedHours.setTimes(time);
+        workedHours.addTime(time);
         return time;
     }
 
-
-
+    /**
+     * Метод получения данных посещений всех сотрудников за определеннный месяц
+     * @param tableName
+     * @return
+     */
+    public MonthAllWorkersHours getMonthTimes(String tableName){
+        monthAllWorkersHours = new MonthAllWorkersHours();
+        ArrayList<Long> ids = jdbc.selectAllIdInMonth(tableName);
+        WorkedHours monthTimes = new WorkedHours();
+        for (Long id: ids) {
+            Worker worker = repository.findById(id).get();
+            monthTimes.setWorker(worker);
+            monthTimes = jdbc.getAllMonthTimes(worker, tableName);
+            monthAllWorkersHours.addWorkedHours(monthTimes);
+        }
+        return monthAllWorkersHours;
+    }
 
 }

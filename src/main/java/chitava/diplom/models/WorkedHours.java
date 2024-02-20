@@ -12,15 +12,15 @@ import java.util.List;
 @NoArgsConstructor
 public class WorkedHours {
 
-    private Long id;
+    private Worker worker;
     private List<LocalDateTime> times = new ArrayList<>();
 
     public LocalDateTime getTime(int id) {
         return times.get(id);
     }
 
-    public void setTimes(LocalDateTime times) {
-        this.times.add(times);
+    public void addTime(LocalDateTime time) {
+        this.times.add(time);
     }
 
     public List<LocalDateTime> getTimes(){
