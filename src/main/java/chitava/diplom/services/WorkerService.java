@@ -8,6 +8,7 @@ import chitava.diplom.models.Worker;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -71,12 +72,19 @@ public interface WorkerService {
     String addReportCard(MultipartFile file) throws IOException, SQLException;
 
     /**
-     * Метод получения лданных о посещении за определенный месяц
-     * @param tableName
+     * Метод расчета зарплаты для одного сотрудника
+     * @param hours Сотрудник с данными по посещениям за конкретный месяц
      * @return
      */
-    public MonthAllWorkersHours getMonthTimes(String tableName) throws SQLException;
-    public MonthSalary salaryCalculation (WorkedHours hours);
+    MonthSalary salaryCalculation (WorkedHours hours);
+
+
+    /**
+     * Метод расчета зарплаты для всех сотрудников за месяц
+     * @param tableName Расчетный месяц
+     * @return
+     */
+    ArrayList<MonthSalary> getAllWorkersSalaryInMonth(String tableName) throws SQLException;
 
 
 

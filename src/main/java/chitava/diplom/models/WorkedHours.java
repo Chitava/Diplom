@@ -13,6 +13,7 @@ import java.util.List;
 public class WorkedHours {
 
     private Worker worker;
+    private boolean dontWork;
     private List<LocalDateTime> times = new ArrayList<>();
 
     public LocalDateTime getTime(int id) {
@@ -30,4 +31,7 @@ public class WorkedHours {
     public void setTimes(List<LocalDateTime> times) {
         this.times = times;
     }
+
+
+
 }

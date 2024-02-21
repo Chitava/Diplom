@@ -7,7 +7,7 @@
     <div th:insert= "~{index :: menu}"></div>
     <section class="resultfield">
       <div class="h1">
-        <h1>Зарплата за estimatedata</h1>
+        <h1>Зарплата за <span th:text="${estimatedDate}"></span></h1>
       </div>
       <div class="table__border">
         <table class="table">
@@ -22,29 +22,46 @@
             <th>Итого за месяц</th>
           </tr>
           </thead>
-          <tbody >
+          <tbody>
           <tr th:each="a: ${allsalary}">
-            <form action="" method="post">
-            <a th:href="@{'/inbulk/worker/' + ${a.workerId}}">
-              <td th:text="${a.workerName}" ></td>
-              <td th:text="${a.workDays}"></td>
-              <td th:text="${a.overDays}"></td>
-              <td th:text="${a.salary}"><span> p.</span></td>
-              <td th:text="${a.overSalary}"><span> р.</span></td>
-              <td>
-                <input class="recalculation" type="number" min="0"/><span th:text="${prepayment}"> р.</span>
-              </td>
-
-
-              <td th:text="${a.fullSalary}"><span> р.</span></td>
-            </a>
-              <td>
-                <button class="button recalculation__button" type="submit">
-                  Пересчитать
-                </button>
-              </td>
-            </form>
-
+            <th:block th:switch="${a.workDays}">
+              <div th:case="0">
+                <td>
+                  <span th:text="${a.workerName}"></span>
+                </td>
+                <td>
+                  не работал в этом месяце
+                </td>
+            </div>
+              <div th:case="*">
+                <form action="" method="post">
+                  <td th:text="${a.workerName}" > <a th:href="@{'/inbulk/worker/' + ${a.workerId}}"></a></td>
+                  <td th:text="${a.workDays}"></td>
+                  <td th:text="${a.overDays}"></td>
+                  <td th:text="${a.salary}"><span> p.</span></td>
+                  <td th:text="${a.overSalary}"><span> р.</span></td>
+                  <td>
+                    <input class="recalculation" type="number" min="0"/><span th:text="${prepayment}"> р.</span>
+                  </td>
+                  <td th:text="${a.fullSalary}"><span> р.</span></td>
+                  <td>
+                    <button class="button recalculation__button" type="submit">
+                      Пересчитать
+                    </button>
+                  </td>
+                </form>
+              </div>
+            </th:block>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">Итого за месяц</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="font-weight: bold;" th:text="${fullpayment}"></td>
+            <td></td>
           </tr>
           </tbody>
         </table>
