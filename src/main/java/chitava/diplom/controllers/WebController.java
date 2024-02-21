@@ -316,13 +316,11 @@ public class WebController {
             model.addAttribute("message", "Вы не установили дату расчета");
             return "result";
         }else {
-            allMonthHours = service.getMonthTimes("salary_2024_02");
-
+            allMonthHours = service.getMonthTimes("salary_2024_01");
             ArrayList<WorkedHours> list = allMonthHours.getMonthAllHours();
             for (int i = 0; i < list.size(); i++) {
                 service.salaryCalculation(list.get(i));
             }
-
             workers = service.getAllWorkers();
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);

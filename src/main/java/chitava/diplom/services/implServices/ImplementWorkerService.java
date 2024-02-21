@@ -335,11 +335,13 @@ public class ImplementWorkerService implements WorkerService {
         Worker worker = hours.getWorker();
         List<LocalDateTime> hour = hours.getTimes();
         String verificationDays = ""; //переменная для проверки выходной или нет
+        LocalDateTime verificationData = LocalDateTime.of(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]),1,0,0);
         int workDays = 0;
         int overDays = 0;
         double sallary = 0;
         double overSallary = 0;
         double fullSalary = 0;
+        double paymentInSmallDayInHour = worker.getPaymentInDay() / 8;
         for (int i = 0; i < hour.size(); i++) {
             String day = String.valueOf(i + 1);
             if (i < 10) {
@@ -347,50 +349,51 @@ public class ImplementWorkerService implements WorkerService {
             } else {
                 verificationDays = day + monthYears;
             }
-            double dayTime= 0;
+            double dayTime = 0;
             String dayHour = String.valueOf(hour.get(i).getHour());
             String dayMinute = String.valueOf(hour.get(i).getMinute());
             if (hour.get(i).getMinute() < 10) {
                 dayTime = Double.parseDouble(dayHour + ".0" + dayMinute);
-            }else {
+            } else {
                 dayTime = Double.parseDouble(dayHour + "." + dayMinute);
             }
-            if (dayTime > 1){
-                if (worker.getPost()) {
-                    if (yearHolidays.contains(verificationDays) || String.valueOf(hour.get(i).getDayOfWeek()) == "SATURDAY"
-                            || String.valueOf(hour.get(i).getDayOfWeek()) == "SUNDAY") {
-                        System.out.println("Выходной " + verificationDays);
-                        //зп в выходной руководителя
-                    } else {
-                        //зп в рабочий день
-                    }
-                }else {
+            if (dayTime > 1) {
                 workDays++;
-                sallary = sallary + worker.getPaymentInDay()*(dayTime-1);
-                if (dayTime > 9){
-                    overSallary = (dayTime-9)*worker.getPaymentInHour();
-                    overDays++;
+                if (worker.getPost()) {
+                    if (yearHolidays.contains(String.valueOf(verificationDays)) || String.valueOf(verificationData.getDayOfWeek()) ==
+                            "SATURDAY" || String.valueOf(verificationData.getDayOfWeek()) == "SUNDAY") {
+                        sallary = sallary + worker.getPeymentInHollydays();
+                    } else {
+                        if (dayTime < 9) {
+                            sallary = sallary + (dayTime - 1) * paymentInSmallDayInHour;
+                        } else if (dayTime > 9.20) {
+                            sallary = sallary + worker.getPaymentInDay();
+                            overSallary = overSallary + (dayTime - 9) * worker.getPaymentInHour();
+                            overDays++;
+                        }else {
+                            sallary = sallary + worker.getPaymentInDay();
+                        }
+                    }
+                } else {
+                    if (dayTime < 9) {
+                        sallary = sallary + (dayTime - 1) * paymentInSmallDayInHour;
+                    } else if (dayTime > 9.20) {
+                        sallary = sallary + worker.getPaymentInDay();
+                        overSallary = overSallary + (dayTime - 9) * worker.getPaymentInHour();
+                        overDays++;
+                    }else {
+                        sallary = sallary + worker.getPaymentInDay();
+                    }
                 }
-
-
-                    //зп в рабочий день
-                }
-            }
-
-
-
-
-
-
-
-/
+            }verificationData = verificationData.plusDays(1);
         }
+        System.out.println("Дни: " + workDays + "\nПереработано: " + overDays + "\nЗП: " + sallary + "\nЗа переработку: "+ Math.round(overSallary*100.0)/100.0);
         return new MonthSalary(worker.getId(), worker.getName(), workDays, overDays, sallary, overSallary, 0,
                 fullSalary);
     }
 
 
-    private MonthSalary sallary (Worker worker, List<LocalDateTime> hour){
+    private MonthSalary sallary(Worker worker, List<LocalDateTime> hour) {
 
         double paymentInDay = worker.getPaymentInDay();
         double paymentInHour = worker.getPaymentInHour();
