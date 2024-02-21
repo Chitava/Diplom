@@ -15,8 +15,8 @@ public class MonthSalary {
     private String workerName;
     private int workDays;
     private int overDays;
-    private double sallary;
-    private double overSallary;
+    private double salary;
+    private double overSalary;
     private double prepayment;
     private double fullSalary;
 }

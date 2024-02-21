@@ -290,7 +290,7 @@ public class WebController {
      * @return страница с результатами выполнения метода
      */
     @PostMapping("/upload")
-    public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException {
+    public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException, SQLException {
         if (EstimatedDate.dateForHTML == "не установлена"){
             Collection<Worker> workers = service.getAllWorkers();
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
@@ -307,25 +307,38 @@ public class WebController {
         }
     }
 
+    /**
+     * Метод обработки запроса на расчет зарплаты всех сотрудников за определенный месяц
+     * @param model
+     * @return страницу с расчетами зарплаты
+     * @throws SQLException
+     * @throws IOException
+     */
+
     @GetMapping("/calcall")
     public String allWorkersSallary(Model model) throws SQLException, IOException {
         Collection<Worker> workers = service.getAllWorkers();
+        ArrayList<MonthSalary> allMonthsalary = new ArrayList<>();
         if (EstimatedDate.dateForHTML == "не установлена") {
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
             model.addAttribute("message", "Вы не установили дату расчета");
             return "result";
         }else {
-            allMonthHours = service.getMonthTimes("salary_2024_01");
+            allMonthHours = service.getMonthTimes(EstimatedDate.dateForDB);
             ArrayList<WorkedHours> list = allMonthHours.getMonthAllHours();
             for (int i = 0; i < list.size(); i++) {
-                service.salaryCalculation(list.get(i));
+                MonthSalary monthSalary = service.salaryCalculation(list.get(i));
+                monthSalary.setWorkerId(list.get(i).getWorker().getId());
+                monthSalary.setWorkerName(list.get(i).getWorker().getName());
+                allMonthsalary.add(monthSalary);
             }
+            model.addAttribute("allsalary", allMonthsalary);
             workers = service.getAllWorkers();
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
 
-            return "allsallary";
+            return "allsalary";
         }
     }
 

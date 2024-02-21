@@ -22,30 +22,34 @@
             <th>Итого за месяц</th>
           </tr>
           </thead>
-          <tbody>
-          <tr th:each="a: ${allSallary}" th:href="@{'/inbulk/worker/' + ${w.id}}">
-            <td th:text="${a.name}"></td>
-            <td th:text="${a.days}"></td>
-            <td th:text="${a.overTime}"></td>
-            <td th:text="${a.sallary}"><span> p.</span></td>
-            <td th:text="${a.overSallary}"><span> р.</span></td>
+          <tbody >
+          <tr th:each="a: ${allsalary}">
             <form action="" method="post">
-              <td th:text="${avans}">
-                <input class="recalculation" /><span> р.</span>
+            <a th:href="@{'/inbulk/worker/' + ${a.workerId}}">
+              <td th:text="${a.workerName}" ></td>
+              <td th:text="${a.workDays}"></td>
+              <td th:text="${a.overDays}"></td>
+              <td th:text="${a.salary}"><span> p.</span></td>
+              <td th:text="${a.overSalary}"><span> р.</span></td>
+              <td>
+                <input class="recalculation" type="number" min="0"/><span th:text="${prepayment}"> р.</span>
               </td>
+
+
               <td th:text="${a.fullSalary}"><span> р.</span></td>
+            </a>
               <td>
                 <button class="button recalculation__button" type="submit">
                   Пересчитать
                 </button>
               </td>
             </form>
+
           </tr>
           </tbody>
         </table>
       </div>
       <section class="all__buttons">
-        <a href="" class="button"> Сохранить </a>
         <a href="" class="button">Распечатать</a>
       </section>
     </section>
