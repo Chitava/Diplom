@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,10 +29,10 @@ public class WebController {
     private ArrayList<MonthSalary> monthSalaries;
     private Collection<Worker> workers;
 
-    private void getAllWorkers(){
+    private void getAllWorkers() {
         try {
             workers = service.getAllWorkers();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -171,12 +172,13 @@ public class WebController {
 
     /**
      * Метод обработки удаления через GET запрос
-     * @param id идентификатор сотрудника
+     *
+     * @param id    идентификатор сотрудника
      * @param model Создаем новую модель для новой страницы
      * @return страницу с результатом операции по удалению сотрудника
      */
     @GetMapping("/delw/{id}")
-    public String getDelWorker(@PathVariable Long id, Model model){
+    public String getDelWorker(@PathVariable Long id, Model model) {
         Worker worker = service.getWorkerById(id);
         service.deleteWorker(worker);
         getAllWorkers();
@@ -263,11 +265,11 @@ public class WebController {
     @PostMapping("/upload")
     public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException, SQLException, ClassNotFoundException {
         getAllWorkers();
-        if (EstimatedDate.dateForHTML == "не установлена"){
+        if (EstimatedDate.dateForHTML == "не установлена") {
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
             model.addAttribute("message", "Вы не установили дату расчета");
-        }else {
+        } else {
             String message = service.addReportCard(file);
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
@@ -278,6 +280,7 @@ public class WebController {
 
     /**
      * Метод обработки запроса на расчет зарплаты всех сотрудников за определенный месяц
+     *
      * @param model
      * @return страницу с расчетами зарплаты
      * @throws SQLException
@@ -292,10 +295,10 @@ public class WebController {
             model.addAttribute("workers", workers);
             model.addAttribute("message", "Вы не установили дату расчета");
             return "result";
-        }else {
-            double fullPayment=0;
-            monthSalaries= service.getAllWorkersSalaryInMonth(EstimatedDate.dateForDB);
-            for (MonthSalary salary: monthSalaries) {
+        } else {
+            double fullPayment = 0;
+            monthSalaries = service.getAllWorkersSalaryInMonth(EstimatedDate.dateForDB);
+            for (MonthSalary salary : monthSalaries) {
                 fullPayment = fullPayment + salary.getFullSalary();
             }
             model.addAttribute("allsalary", monthSalaries);
@@ -307,14 +310,14 @@ public class WebController {
     }
 
     @PostMapping("/prepayment/{id}")
-    public String prepayment (@PathVariable ("id") Long id, Double prepayment, Model model){
-        double fullPayment=0;
-        for (MonthSalary salary: monthSalaries) {
+    public String prepayment(@PathVariable("id") Long id, Double prepayment, Model model) {
+        double fullPayment = 0;
+        for (MonthSalary salary : monthSalaries) {
             fullPayment = fullPayment + salary.getFullSalary();
         }
-        for (MonthSalary oneWorkersalary: monthSalaries) {
-            if(oneWorkersalary.getWorkerId().equals(id)){
-                oneWorkersalary.setFullSalary(oneWorkersalary.getFullSalary()-prepayment);
+        for (MonthSalary oneWorkersalary : monthSalaries) {
+            if (oneWorkersalary.getWorkerId().equals(id)) {
+                oneWorkersalary.setFullSalary(oneWorkersalary.getFullSalary() - prepayment);
                 oneWorkersalary.setPrepayment(prepayment);
             }
         }
@@ -329,9 +332,16 @@ public class WebController {
     }
 
 
+    @GetMapping("/save")
+    public String save(Model model) throws IOException {
+        getAllWorkers();
+        String message = service.saveTo(monthSalaries);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("workers", workers);
+        model.addAttribute("message", "Данные успешно сохранены " + message);
+        return "result";
 
-
-
+    }
 }
 
 

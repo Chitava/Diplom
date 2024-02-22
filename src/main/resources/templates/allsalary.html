@@ -15,7 +15,8 @@
           <tr>
             <th>ФИО</th>
             <th>Отработано в месяце дней</th>
-            <th>Дней с переработкой</th>
+            <th>Отработано в выходные</th>
+            <th>Время переработки</th>
             <th>Зарплата за полные дни</th>
             <th>Зарплата за переработку</th>
             <th>Аванс</th>
@@ -37,7 +38,8 @@
                 <form th:action="@{'/inbulk/prepayment/' + ${a.workerId}}" method="post">
                   <td th:text="${a.workerName}" ></td>
                   <td th:text="${a.workDays}"></td>
-                  <td th:text="${a.overDays}"></td>
+                  <td th:text="${a.hollydays}"></td>
+                  <td th:text="${a.overTimes}"></td>
                   <td th:text="${a.salary}"><span> p.</span></td>
                   <td th:text="${a.overSalary}"><span> р.</span></td>
                   <td>
@@ -71,7 +73,8 @@
         </table>
       </div>
       <section class="all__buttons">
-        <a href="" class="button">Распечатать</a>
+        <a th:href="@{/inbulk/save}" class="button">Сохранить</a>
+        <a th:href="@{/inbulk/save}" class="button">Распечатать</a>
       </section>
     </section>
     <div th:insert= "~{index :: workersmenu}"></div>

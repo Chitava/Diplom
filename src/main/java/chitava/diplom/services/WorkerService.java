@@ -87,6 +87,11 @@ public interface WorkerService {
     ArrayList<MonthSalary> getAllWorkersSalaryInMonth(String tableName) throws SQLException;
 
 
-
+    /**\
+     * Метод сохранения полученных данных при расчета зарплаты за месяц
+     * @param salarys
+     * @return
+     */
+    String saveTo(ArrayList<MonthSalary> salarys) throws IOException;
 
 }

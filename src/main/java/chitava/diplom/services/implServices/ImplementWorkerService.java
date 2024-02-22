@@ -3,6 +3,7 @@ package chitava.diplom.services.implServices;
 import chitava.diplom.models.*;
 
 import chitava.diplom.repositorys.WorkersRepository;
+import chitava.diplom.services.SendTo;
 import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static chitava.diplom.models.Hollydays.yearHolidays;
+import static org.apache.commons.math3.util.Precision.round;
 
 
 /**
@@ -42,6 +44,9 @@ public class ImplementWorkerService implements WorkerService {
     private WorkedHours workedHours;
     @Autowired
     private MonthAllWorkersHours monthAllWorkersHours;
+
+    @Autowired
+    private SendTo send;
 
 
     /**
@@ -355,7 +360,8 @@ public class ImplementWorkerService implements WorkerService {
         LocalDateTime verificationData = LocalDateTime.of(Integer.parseInt(temp[0]),
                 Integer.parseInt(temp[1]), 1, 0, 0);
         int workDays = 0;
-        int overDays = 0;
+        double overTimes = 0;
+        int hollydays = 0;
         double salary = 0;
         double overSalary = 0;
         double fullSalary = 0;
@@ -383,6 +389,7 @@ public class ImplementWorkerService implements WorkerService {
                     if (yearHolidays.contains(String.valueOf(verificationDays)) || String.valueOf(verificationData.getDayOfWeek()) ==
                             "SATURDAY" || String.valueOf(verificationData.getDayOfWeek()) == "SUNDAY") {
                         salary = salary + worker.getPeymentInHollydays();
+                        hollydays ++;
                     } else {
                         //если отработано менее 9 часов
                         if (dayTime < 9) {
@@ -392,7 +399,7 @@ public class ImplementWorkerService implements WorkerService {
                         else if (dayTime > 9.20) {
                             salary = salary + worker.getPaymentInDay();
                             overSalary = overSalary + (dayTime - 9) * worker.getPaymentInHour();
-                            overDays++;
+                            overTimes = overTimes + (dayTime - 9);
                         }
                         //если ровно 9 часов
                         else {
@@ -400,14 +407,13 @@ public class ImplementWorkerService implements WorkerService {
                         }
                     }
                 }
-                //если не руководитель
                 else {
                     if (dayTime < 9) {
                         salary = salary + (dayTime - 1) * paymentInSmallDayInHour;
                     } else if (dayTime > 9.20) {
                         salary = salary + worker.getPaymentInDay();
                         overSalary = overSalary + (dayTime - 9) * worker.getPaymentInHour();
-                        overDays++;
+                        overTimes = overTimes + (dayTime - 9);
                     } else {
                         salary = salary + worker.getPaymentInDay();
                     }
@@ -416,11 +422,18 @@ public class ImplementWorkerService implements WorkerService {
             verificationData = verificationData.plusDays(1);
             fullSalary = salary + overSalary;
         }
-        MonthSalary monthSalary = new MonthSalary(worker.getId(), worker.getName(), workDays, overDays, Math.round(salary * 100 / 100),
-                Math.round(overSalary * 100 / 100), Math.round(fullSalary * 100 / 100));
+        MonthSalary monthSalary = new MonthSalary(worker.getId(), worker.getName(), workDays, hollydays,
+                round(overTimes, 2), round(salary, 2), round(overSalary, 2),
+                round(fullSalary,2));
         return monthSalary;
     }
 
+    /**
+     * Метод расчета зарплаты всех сотрудников
+     * @param tableName Расчетный месяц
+     * @return
+     * @throws SQLException
+     */
     public ArrayList<MonthSalary> getAllWorkersSalaryInMonth(String tableName) throws SQLException {
         List<String> allWorkersId = repository.findAllIdWorker();
         ArrayList<MonthSalary> result = new ArrayList<>();
@@ -434,4 +447,15 @@ public class ImplementWorkerService implements WorkerService {
         }
         return result;
     }
+
+    /**\
+     * Метод сохранения полученных данных при расчета зарплаты за месяц
+     * @param salarys
+     * @return
+     */
+    public String saveTo(ArrayList<MonthSalary> salarys) throws IOException {
+        String message = send.sendTo(salarys);
+        return message;
+    }
+
 }
