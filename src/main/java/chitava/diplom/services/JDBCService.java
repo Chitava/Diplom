@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 @Service
 @RequiredArgsConstructor
-public class JDBCService {
+public class JDBCService implements JDBCService {
 
     private static Connection connection;
     private static Statement statment;
