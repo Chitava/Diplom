@@ -2,6 +2,7 @@ package chitava.diplom.services.implServices;
 import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
 
+import chitava.diplom.services.JDBCService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.sql.*;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
  */
 @Service
 @RequiredArgsConstructor
-public class ImplementJDBCService {
+public class ImplementJDBCService implements JDBCService {
         private Connection connection;
 
     /**
@@ -90,7 +91,6 @@ public class ImplementJDBCService {
         connection.close();
     }
 
-
     /**
      * Метод проверки наличия сотрудника с номером в базе данных
      * @param id
@@ -108,7 +108,12 @@ public class ImplementJDBCService {
         return false;
     }
 
-
+    /**
+     * Метод выбора всех идентификаторов из таблицы времени посещения в определнный месяц
+     * @param tableName
+     * @return
+     * @throws SQLException
+     */
     public ArrayList<Long> selectAllIdInMonth(String tableName) throws SQLException {
         String queryForId = "select workerid from " + tableName + ";";
         ArrayList<Long> monthId= new ArrayList<>();
@@ -120,7 +125,6 @@ public class ImplementJDBCService {
         connection.close();
         return monthId;
     }
-
 
     /**
      * Метод получения всех данных определенного сотрудника из таблицы с данными посещения за определенный месяц
