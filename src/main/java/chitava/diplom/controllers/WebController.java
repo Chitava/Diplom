@@ -1,7 +1,6 @@
 package chitava.diplom.controllers;
 
 import chitava.diplom.models.*;
-import chitava.diplom.services.JDBCService;
 import chitava.diplom.services.WorkerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -26,7 +25,7 @@ public class WebController {
      */
 
     private final WorkerService service;
-    private final JDBCService jdbc;
+
 
 
 

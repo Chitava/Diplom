@@ -85,7 +85,7 @@ public class EstimatedDate {
      * @param date дата для наименования таблиц в базе данных
      */
     public static void setDateForDB(String date) {
-        dateForDB = "salary_" + date.replace("-","_");
+        dateForDB = "times_" + date.replace("-","_");
     }
     //endregion
 }

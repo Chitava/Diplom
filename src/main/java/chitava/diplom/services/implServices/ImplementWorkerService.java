@@ -3,7 +3,6 @@ package chitava.diplom.services.implServices;
 import chitava.diplom.models.*;
 
 import chitava.diplom.repositorys.WorkersRepository;
-import chitava.diplom.services.JDBCService;
 import chitava.diplom.services.WorkerService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -52,7 +51,7 @@ public class ImplementWorkerService implements WorkerService {
     private WorkersRepository repository;
 
     @Autowired
-    JDBCService jdbc;
+    ImplementJDBCService jdbc;
 
 
     /**
@@ -203,73 +202,68 @@ public class ImplementWorkerService implements WorkerService {
      */
     public String addReportCard(MultipartFile file) throws SQLException {
         jdbc.createTable(EstimatedDate.dateForDB);
+        HSSFWorkbook hb;
         int count = 0;
-        try {
-            POIFSFileSystem pSystem = new POIFSFileSystem(file.getInputStream());
-            HSSFWorkbook hb = new HSSFWorkbook(pSystem);
-            HSSFSheet sheet = hb.getSheetAt(0);
-            int lastrow = sheet.getLastRowNum();
-            int number;
-            for (int i = 0; i < lastrow + 1; i++) {
-                Row row = sheet.getRow(i);
-                int lastCell = row.getLastCellNum();
-                try {
-                    number = 1;
-                    Integer.parseInt(String.valueOf(row.getCell(0)));
-                    String workerName = String.valueOf(row.getCell(1)).replace("\n", "");
-                    worker = findByName(workerName);
-                    if (worker == null) {
-                        worker = new Worker();
-                        worker.setName(workerName);
-                        worker.setNewWorker(true);
-                        createWorker(worker);
-                        count++;
-                    }
-                    workedHours = new WorkedHours();
-                    workedHours.setWorker(worker);
-                    monthAllWorkersHours.addWorkedHours(workedHours);
-                    if (!jdbc.selectID(worker.getId().toString(), EstimatedDate.dateForDB)) {
-                        jdbc.insert(EstimatedDate.dateForDB, worker.getId().toString());
-                    }
-                    for (int j = 3; j < lastCell - 2; j++) {
-                        String fullTime = String.valueOf(row.getCell(j));
-                        LocalDateTime time = addTime(fullTime, number);
-                        if (time.equals("")) {
-                            break;
-                        } else {
-                            jdbc.addTime(EstimatedDate.dateForDB, worker.getId().toString(), number, time);
-                            number++;
-                        }
-                    }
-                } catch (NumberFormatException e) {
-                    number = 16;
-                    for (int j = 3; j < lastCell - 1; j++) {
-                        String fullTime = String.valueOf(row.getCell(j));
-                        LocalDateTime time = addTime(fullTime, number);
-                        jdbc.addTime(EstimatedDate.dateForDB, worker.getId().toString(), number, time);
-                        number++;
-                    }
-                }
-            }
-            if (count > 0) {
-                switch (count) {
-                    case 1:
-                        return "Новые данные о сотрудниках загружены успешно, У Вас новый сотрудник";
-                    case 2:
-                        return "Новые данные о сотрудниках загружены успешно, У Вас 2 новых сотрудника";
-                    case 3:
-                        return "Новые данные о сотрудниках загружены успешно, У Вас 3 новых сотрудника";
-                    case 4:
-                        return "Новые данные о сотрудниках загружены успешно, У Вас 4 новых сотрудника";
-                    default:
-                        return String.format("Новые данные о сотрудниках загружены успешно, У Вас %s новых " +
-                                "сотрудников", count);
-                }
-            } else {
-                return "Новые данные о сотрудниках загружены успешно";
-            }
+        try (POIFSFileSystem pSystem = new POIFSFileSystem(file.getInputStream());) {
+            hb = new HSSFWorkbook(pSystem);
         } catch (Exception e) {
             return "В процессе добавления новых сотрудников произошла ошибка " + e.getMessage();
+        }
+        HSSFSheet sheet = hb.getSheetAt(0);
+        int lastrow = sheet.getLastRowNum();
+        String fullTime = "";
+        for (int i = 0; i < lastrow + 1; i++) {
+            Row row = sheet.getRow(i);
+            int lastCell = row.getLastCellNum();
+            try {
+                Integer.parseInt(String.valueOf(row.getCell(0)));
+                String workerName = String.valueOf(row.getCell(1)).replace("\n", "");
+                worker = findByName(workerName);
+                if (worker == null) {
+                    worker = new Worker();
+                    worker.setName(workerName);
+                    worker.setNewWorker(true);
+                    createWorker(worker);
+                    count++;
+                }
+                workedHours = new WorkedHours();
+                workedHours.setWorker(worker);
+                monthAllWorkersHours.addWorkedHours(workedHours);
+                if (!jdbc.selectID(worker.getId().toString(), EstimatedDate.dateForDB)) {
+                    jdbc.insert(EstimatedDate.dateForDB, worker.getId().toString());
+                }
+                for (int j = 3; j < lastCell - 2; j++) {
+                    fullTime = String.valueOf(row.getCell(j));
+                    addTimesInWorkedHours(fullTime, workedHours);
+                }
+            } catch (NumberFormatException e) {
+                for (int j = 3; j < lastCell - 1; j++) {
+                    fullTime = String.valueOf(row.getCell(j));
+                    addTimesInWorkedHours(fullTime, workedHours);
+                }
+                for (int k = 0; k < workedHours.getTimes().size(); k++) {
+                    jdbc.addTime(EstimatedDate.dateForDB, String.valueOf(workedHours.getWorker().getId()), k+1,
+                            workedHours.getTime(k));
+                }
+            }
+        }
+
+        if (count > 0) {
+            switch (count) {
+                case 1:
+                    return "Новые данные о сотрудниках загружены успешно, У Вас новый сотрудник";
+                case 2:
+                    return "Новые данные о сотрудниках загружены успешно, У Вас 2 новых сотрудника";
+                case 3:
+                    return "Новые данные о сотрудниках загружены успешно, У Вас 3 новых сотрудника";
+                case 4:
+                    return "Новые данные о сотрудниках загружены успешно, У Вас 4 новых сотрудника";
+                default:
+                    return String.format("Новые данные о сотрудниках загружены успешно, У Вас %s новых " +
+                            "сотрудников", count);
+            }
+        } else {
+            return "Новые данные о сотрудниках загружены успешно";
         }
     }
 
@@ -278,34 +272,51 @@ public class ImplementWorkerService implements WorkerService {
      *
      * @param times Время посещения за день
      */
-    public LocalDateTime addTime(String times, int day) {
-        LocalDateTime time = null;
-        if (!times.equals("--\n--\n--") && times.length() > 0) {
-            String[] str = times.split("\n");
-            int comeHour = Integer.parseInt(str[0].substring(0, str[0].indexOf(":")));
-            int comeMinute = Integer.parseInt(str[0].substring(str[0].indexOf(":") + 1));
-            int leftHour = Integer.parseInt(str[1].substring(0, str[1].indexOf(":")));
-            int leftMinute = Integer.parseInt(str[1].substring(str[1].indexOf(":") + 1));
-            LocalTime comeWork = LocalTime.of(comeHour, comeMinute);
-            LocalTime leftWork = LocalTime.of(leftHour, leftMinute);
-            if (comeWork.compareTo(leftWork) > 0) {
-                LocalTime fullDay = LocalTime.of(00, 00);
-                LocalTime addTime = fullDay.minusHours(comeHour)
-                        .minusMinutes(comeMinute)
-                        .plusHours(leftHour)
-                        .plusMinutes(leftMinute);
-                time = LocalDateTime.of(2024, 1, day, addTime.getHour(), addTime.getMinute());
-            } else {
-                int hour = Integer.parseInt(str[2].substring(0, str[2].indexOf(":")));
-                int minute = Integer.parseInt(str[2].substring(str[2].indexOf(":") + 1));
-                time = LocalDateTime.of(2024, 1, day, hour, minute);
-            }
+
+    public void addTimesInWorkedHours(String times, WorkedHours workedHours) {
+        String[] time = times.split("\n");
+        if (times.equals("")) {
+            return;
+        } else if (time.equals("--\n--\n--") || time[0].equals("--") || time[1].equals("--")) {
+            workedHours.addTime(LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(),
+                    LocalDateTime.now().getDayOfMonth(), 0, 0));
         } else {
-            time = LocalDateTime.of(2024, 1, day, 0, 0);
+            int hour = Integer.parseInt(time[2].substring(0, time[2].indexOf(":")));
+            int minute = Integer.parseInt(time[2].substring(time[2].indexOf(":") + 1));
+            workedHours.addTime(LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(),
+                    LocalDateTime.now().getDayOfMonth(), hour, minute));
         }
-        workedHours.addTime(time);
-        return time;
     }
+
+
+//    public LocalDateTime addTime(String times, int day) {
+//        LocalDateTime time = null;
+//        if (!times.equals("--\n--\n--") && times.length() > 0) {
+//            String[] str = times.split("\n");
+//            int comeHour = Integer.parseInt(str[0].substring(0, str[0].indexOf(":")));
+//            int comeMinute = Integer.parseInt(str[0].substring(str[0].indexOf(":") + 1));
+//            int leftHour = Integer.parseInt(str[1].substring(0, str[1].indexOf(":")));
+//            int leftMinute = Integer.parseInt(str[1].substring(str[1].indexOf(":") + 1));
+//            LocalTime comeWork = LocalTime.of(comeHour, comeMinute);
+//            LocalTime leftWork = LocalTime.of(leftHour, leftMinute);
+//            if (comeWork.compareTo(leftWork) > 0) {
+//                LocalTime fullDay = LocalTime.of(00, 00);
+//                LocalTime addTime = fullDay.minusHours(comeHour)
+//                        .minusMinutes(comeMinute)
+//                        .plusHours(leftHour)
+//                        .plusMinutes(leftMinute);
+//                time = LocalDateTime.of(2024, 1, day, addTime.getHour(), addTime.getMinute());
+//            } else {
+//                int hour = Integer.parseInt(str[2].substring(0, str[2].indexOf(":")));
+//                int minute = Integer.parseInt(str[2].substring(str[2].indexOf(":") + 1));
+//                time = LocalDateTime.of(2024, 1, day, hour, minute);
+//            }
+//        } else {
+//            time = LocalDateTime.of(2024, 1, day, 0, 0);
+//        }
+//        workedHours.addTime(time);
+//        return time;
+//    }
 
     /**
      * Метод получения данных посещений всех сотрудников за определеннный месяц
@@ -333,7 +344,7 @@ public class ImplementWorkerService implements WorkerService {
      * @return
      */
     public MonthSalary salaryCalculation(WorkedHours hours) {
-        String[] temp = new StringBuilder(EstimatedDate.dateForDB.replace("salary_", ""))
+        String[] temp = new StringBuilder(EstimatedDate.dateForDB.replace("times_", ""))
                 .toString().split("_");
         String monthYears = new StringBuilder(".").append(temp[1]).append(".").append(temp[0]).toString();
         //получаем дату месяц.год
