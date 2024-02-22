@@ -25,11 +25,17 @@ public class WebController {
      */
 
     private final WorkerService service;
+    private ArrayList<MonthSalary> monthSalaries;
+    private Collection<Worker> workers;
 
+    private void getAllWorkers(){
+        try {
+            workers = service.getAllWorkers();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
-
-
-//    private final OneWorkedHours workedHours;
+    }
 
     /**
      * Обработка запроса на стартовую страницу
@@ -38,14 +44,7 @@ public class WebController {
      */
     @GetMapping("")
     public String startPage(Model model) {
-        Collection<Worker> workers = null;
-        try {
-            workers = service.getAllWorkers();
-        } catch (Exception e) {
-            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
-            model.addAttribute("message", "Ошибка базы данных" + e);
-            return "result";
-        }
+        getAllWorkers();
         model.addAttribute("workers", workers);
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
 
@@ -61,13 +60,7 @@ public class WebController {
      */
     @PostMapping("/setworkdate")
     public String setWorkDate(@ModelAttribute("estimatedDate") String date, Model model) {
-        Collection<Worker> workers = null;
-        try {
-            workers = service.getAllWorkers();
-        } catch (Exception e) {
-            model.addAttribute("message", "Ошибка базы данных" + e);
-            return "result";
-        }
+        getAllWorkers();
         model.addAttribute("workers", workers);
         EstimatedDate.setDateForDB(date);
         EstimatedDate.setDateForHTML(date);
@@ -75,14 +68,13 @@ public class WebController {
         try {
             String year = EstimatedDate.dateForHTML.substring(EstimatedDate.dateForHTML.indexOf(" "));
             String message = service.getHollydays(year);
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             if (message == null) {
-                model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
                 model.addAttribute("message", "Дата расчета установлена " + EstimatedDate.dateForHTML);
-                return "result";
             } else {
                 model.addAttribute("message", message);
-                return "result";
             }
+            return "result";
         } catch (StringIndexOutOfBoundsException e) {
             model.addAttribute("message", "Ошибка выбора даты");
             return "result";
@@ -96,13 +88,7 @@ public class WebController {
      */
     @GetMapping("/writer")
     public String writeData(Model model) {
-        Collection<Worker> workers = null;
-        try {
-            workers = service.getAllWorkers();
-        } catch (Exception e) {
-            model.addAttribute("message", "Ошибка базы данных" + e);
-            return "result";
-        }
+        getAllWorkers();
         model.addAttribute("workers", workers);
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         return "writer";
@@ -116,13 +102,7 @@ public class WebController {
      */
     @RequestMapping(value = "/add", method = RequestMethod.GET)
     public String addWorker(Model model) {
-        Collection<Worker> workers = null;
-        try {
-            workers = service.getAllWorkers();
-        } catch (Exception e) {
-            model.addAttribute("message", "Ошибка базы данных" + e);
-            return "result";
-        }
+        getAllWorkers();
         model.addAttribute("workers", workers);
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("worker", new Worker());
@@ -139,13 +119,7 @@ public class WebController {
     @RequestMapping(value = "/addworker", method = RequestMethod.POST)
     public String addNewWorker(@ModelAttribute("worker") Worker worker, Model model) {
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
-        Collection<Worker> workers = null;
-        try {
-            workers = service.getAllWorkers();
-        } catch (Exception e) {
-            model.addAttribute("message", "Ошибка базы данных" + e);
-            return "result";
-        }
+        getAllWorkers();
         for (Worker w : workers) {
             if (w.getName().equals(worker.getName())) {
                 model.addAttribute("message", "Сотрудник с таким именем уже присутствует");
@@ -154,7 +128,7 @@ public class WebController {
             }
         }
         service.createWorker(worker);
-        workers = service.getAllWorkers();
+        getAllWorkers();
         model.addAttribute("message", "Операция добавления нового сотрудника выполнена " +
                 "успешно");
         model.addAttribute("workers", workers);
@@ -170,7 +144,7 @@ public class WebController {
      */
     @GetMapping("/del")
     public String delWorker(Model model) {
-        Collection<Worker> workers = service.getAllWorkers();
+        getAllWorkers();
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         return "delworker";
@@ -187,7 +161,7 @@ public class WebController {
     public String deleteWorker(@ModelAttribute("selected") Long id, Model model) {
         Worker worker = service.getWorkerById(id);
         service.deleteWorker(worker);
-        Collection<Worker> workers = service.getAllWorkers();
+        getAllWorkers();
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         model.addAttribute("message", String.format("Операция удаления сотрудника %s выполнена " +
@@ -205,7 +179,7 @@ public class WebController {
     public String getDelWorker(@PathVariable Long id, Model model){
         Worker worker = service.getWorkerById(id);
         service.deleteWorker(worker);
-        Collection<Worker> workers = service.getAllWorkers();
+        getAllWorkers();
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         model.addAttribute("message", String.format("Операция удаления сотрудника %s выполнена " +
@@ -221,7 +195,7 @@ public class WebController {
      */
     @GetMapping("/edit")
     public String edit(Model model) {
-        Collection<Worker> workers = service.getAllWorkers();
+        getAllWorkers();
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         return "edit";
@@ -237,7 +211,7 @@ public class WebController {
     @PostMapping("/editworker")
     public String editWorker(@ModelAttribute("selected") Long id, Model model) {
         Worker worker = service.getWorkerById(id);
-        Collection<Worker> workers = service.getAllWorkers();
+        getAllWorkers();
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         model.addAttribute("worker", worker);
@@ -254,7 +228,7 @@ public class WebController {
     @GetMapping("/worker/{id}")
     public String eWorker(@PathVariable("id") Long id, Model model) {
         Worker worker = service.getWorkerById(id);
-        Collection<Worker> workers = service.getAllWorkers();
+        getAllWorkers();
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         model.addAttribute("worker", worker);
@@ -271,7 +245,7 @@ public class WebController {
     @PostMapping("/workeredit")
     public String saveEditWorker(Model model, Worker worker) {
         service.updateWorker(worker);
-        Collection<Worker> workers = service.getAllWorkers();
+        getAllWorkers();
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         model.addAttribute("message", String.format("Операция редактирования сотрудника %s выполнена " +
@@ -287,21 +261,19 @@ public class WebController {
      * @return страница с результатами выполнения метода
      */
     @PostMapping("/upload")
-    public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException, SQLException {
+    public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException, SQLException, ClassNotFoundException {
+        getAllWorkers();
         if (EstimatedDate.dateForHTML == "не установлена"){
-            Collection<Worker> workers = service.getAllWorkers();
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
             model.addAttribute("message", "Вы не установили дату расчета");
-            return "result";
         }else {
             String message = service.addReportCard(file);
-            Collection<Worker> workers = service.getAllWorkers();
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
             model.addAttribute("message", message);
-            return "result";
         }
+        return "result";
     }
 
     /**
@@ -314,7 +286,7 @@ public class WebController {
 
     @GetMapping("/calcall")
     public String allWorkersSallary(Model model) throws SQLException {
-        Collection<Worker> workers = service.getAllWorkers();
+        getAllWorkers();
         if (EstimatedDate.dateForHTML == "не установлена") {
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
@@ -322,18 +294,41 @@ public class WebController {
             return "result";
         }else {
             double fullPayment=0;
-            ArrayList<MonthSalary> allMonthsalary = service.getAllWorkersSalaryInMonth(EstimatedDate.dateForDB);
-            for (MonthSalary salary: allMonthsalary) {
+            monthSalaries= service.getAllWorkersSalaryInMonth(EstimatedDate.dateForDB);
+            for (MonthSalary salary: monthSalaries) {
                 fullPayment = fullPayment + salary.getFullSalary();
             }
-            model.addAttribute("allsalary", allMonthsalary);
-            workers = service.getAllWorkers();
+            model.addAttribute("allsalary", monthSalaries);
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
             model.addAttribute("fullpayment", fullPayment);
             return "allsalary";
         }
     }
+
+    @PostMapping("/prepayment/{id}")
+    public String prepayment (@PathVariable ("id") Long id, Double prepayment, Model model){
+        double fullPayment=0;
+        for (MonthSalary salary: monthSalaries) {
+            fullPayment = fullPayment + salary.getFullSalary();
+        }
+        for (MonthSalary oneWorkersalary: monthSalaries) {
+            if(oneWorkersalary.getWorkerId().equals(id)){
+                oneWorkersalary.setFullSalary(oneWorkersalary.getFullSalary()-prepayment);
+                oneWorkersalary.setPrepayment(prepayment);
+            }
+        }
+        workers = service.getAllWorkers();
+        model.addAttribute("prepayment", prepayment);
+        model.addAttribute("allsalary", monthSalaries);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("allsalary", monthSalaries);
+        model.addAttribute("workers", workers);
+        model.addAttribute("fullpayment", fullPayment);
+        return "allsalary";
+    }
+
+
 
 
 

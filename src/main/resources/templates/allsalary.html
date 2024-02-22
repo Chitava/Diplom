@@ -34,14 +34,18 @@
                 </td>
             </div>
               <div th:case="*">
-                <form action="" method="post">
-                  <td th:text="${a.workerName}" > <a th:href="@{'/inbulk/worker/' + ${a.workerId}}"></a></td>
+                <form th:action="@{'/inbulk/prepayment/' + ${a.workerId}}" method="post">
+                  <td th:text="${a.workerName}" ></td>
                   <td th:text="${a.workDays}"></td>
                   <td th:text="${a.overDays}"></td>
                   <td th:text="${a.salary}"><span> p.</span></td>
                   <td th:text="${a.overSalary}"><span> р.</span></td>
                   <td>
-                    <input class="recalculation" type="number" min="0"/><span th:text="${prepayment}"> р.</span>
+                      <input th:sase="null" class="recalculation" type="number" min="0" name="prepayment"
+                             th:value="${a.prepayment}"/>
+                      <span>
+                        р.
+                      </span>
                   </td>
                   <td th:text="${a.fullSalary}"><span> р.</span></td>
                   <td>

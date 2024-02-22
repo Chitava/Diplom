@@ -69,7 +69,7 @@ public interface WorkerService {
      * @return
      * @throws IOException
      */
-    String addReportCard(MultipartFile file) throws IOException, SQLException;
+    String addReportCard(MultipartFile file) throws IOException, SQLException, ClassNotFoundException;
 
     /**
      * Метод расчета зарплаты для одного сотрудника

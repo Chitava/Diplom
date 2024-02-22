@@ -200,7 +200,7 @@ public class ImplementWorkerService implements WorkerService {
      * @return
      * @throws IOException
      */
-    public String addReportCard(MultipartFile file) throws SQLException {
+    public String addReportCard(MultipartFile file) throws SQLException, ClassNotFoundException {
         jdbc.createTable(EstimatedDate.dateForDB);
         HSSFWorkbook hb;
         int count = 0;
@@ -416,8 +416,9 @@ public class ImplementWorkerService implements WorkerService {
             verificationData = verificationData.plusDays(1);
             fullSalary = salary + overSalary;
         }
-        return new MonthSalary(worker.getId(), worker.getName(), workDays, overDays, Math.round(salary * 100 / 100),
-                Math.round(overSalary * 100 / 100), 0, Math.round(fullSalary * 100 / 100));
+        MonthSalary monthSalary = new MonthSalary(worker.getId(), worker.getName(), workDays, overDays, Math.round(salary * 100 / 100),
+                Math.round(overSalary * 100 / 100), Math.round(fullSalary * 100 / 100));
+        return monthSalary;
     }
 
     public ArrayList<MonthSalary> getAllWorkersSalaryInMonth(String tableName) throws SQLException {

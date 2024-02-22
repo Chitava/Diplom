@@ -1,7 +1,7 @@
 package chitava.diplom.services.implServices;
 import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
-import chitava.diplom.services.JDBCService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.sql.*;
@@ -13,11 +13,8 @@ import java.util.ArrayList;
  */
 @Service
 @RequiredArgsConstructor
-public class ImplementJDBCService implements JDBCService {
-
-    private static Connection connection;
-    private static Statement statment;
-    private static ResultSet result;
+public class ImplementJDBCService {
+        private Connection connection;
 
     /**
      * Метод получения соединения с БД
@@ -25,22 +22,23 @@ public class ImplementJDBCService implements JDBCService {
      * @throws ClassNotFoundException
      * @throws SQLException
      */
-    public Statement getStatment() throws ClassNotFoundException, SQLException {
+    public Connection getConnection(){
         String URL = "jdbc:mysql://localhost:3306/mysql";
         String USER = "root";
         String PASS = "Vch32396!";
         connection = null;
-        statment = null;
-        connection = DriverManager.getConnection(URL, USER, PASS);
-        statment = connection.createStatement();
-        return statment;
+        try {
+            connection = DriverManager.getConnection(URL, USER, PASS);
+        } catch (SQLException e) {
+            System.out.println("Connection Failed : " + e.getMessage());
+        }return connection;
     }
 
     /**
      * Метод создание таблицы в зависимости от месяца расчета
      * @param tableName
      */
-    public void createTable(String tableName) throws SQLException {
+    public void createTable(String tableName) throws SQLException, ClassNotFoundException {
         StringBuilder query = new StringBuilder();
         query.append("CREATE TABLE IF NOT EXISTS ");
         query.append(tableName + " (workerid VARCHAR (100) PRIMARY KEY UNIQUE, ");
@@ -51,11 +49,9 @@ public class ImplementJDBCService implements JDBCService {
             query.append(numberDay + " DATETIME, ");
         }
         query.append("day31 DATETIME);");
-        try {
-            getStatment().execute(query.toString());
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }connection.close();
+        Statement statement = getConnection().createStatement();
+        statement.execute(query.toString());
+        connection.close();
     }
 
     /**
@@ -65,12 +61,9 @@ public class ImplementJDBCService implements JDBCService {
      */
     public void insert(String tableName, String workerid) throws SQLException {
         String query = "Insert into " + tableName + "(workerid) VALUE (" + workerid + ");";
-        try {
-            getStatment().executeUpdate(query);
-
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }connection.close();
+        Statement statement = getConnection().createStatement();
+        statement.executeUpdate(query);
+        connection.close();
     }
 
     /**
@@ -91,12 +84,10 @@ public class ImplementJDBCService implements JDBCService {
                 .append("' WHERE workerid = ")
                 .append(workerid)
                 .append(";");
-        try {
-            getStatment().executeUpdate(String.valueOf(query));
 
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }connection.close();
+        Statement statement = getConnection().createStatement();
+        statement.executeUpdate(String.valueOf(query));
+        connection.close();
     }
 
 
@@ -108,15 +99,12 @@ public class ImplementJDBCService implements JDBCService {
      */
     public boolean selectID(String id, String tableName) throws SQLException {
         String query = "select workerid from " + tableName + " where workerid = " + id + ";";
-        try {
-            result = getStatment().executeQuery(query);
-            while(result.next()) {
-                return true;
-            }
-        } catch (
-                SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }connection.close();
+        Statement statement = getConnection().createStatement();
+        ResultSet result = statement.executeQuery(query);
+        while(result.next()) {
+            return true;
+        }
+        connection.close();
         return false;
     }
 
@@ -124,16 +112,12 @@ public class ImplementJDBCService implements JDBCService {
     public ArrayList<Long> selectAllIdInMonth(String tableName) throws SQLException {
         String queryForId = "select workerid from " + tableName + ";";
         ArrayList<Long> monthId= new ArrayList<>();
-
-        try {
-            result = getStatment().executeQuery(queryForId);
-            while(result.next()) {
-                monthId.add(Long.valueOf(result.getString(1)));
-            }
-        } catch (
-                SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }connection.close();
+        Statement statement = getConnection().createStatement();
+        ResultSet result = statement.executeQuery(queryForId);
+        while(result.next()) {
+            monthId.add(Long.valueOf(result.getString(1)));
+        }
+        connection.close();
         return monthId;
     }
 
@@ -148,18 +132,19 @@ public class ImplementJDBCService implements JDBCService {
         String query = "SELECT * FROM " + tableName + " WHERE workerid = "+ worker.getId().toString() + ";";
         WorkedHours hours = new WorkedHours();
         hours.setWorker(worker);
-        try {
-            result = getStatment().executeQuery(query);
-            while(result.next()) {
-                for (int i = 2; i < 32; i++) {
-                    LocalDateTime time = LocalDateTime.parse(result.getString(i).replace(" ",  "T"));
+        Statement statement = getConnection().createStatement();
+        ResultSet result = statement.executeQuery(query);
+        while(result.next()) {
+            for (int i = 2; i < 31; i++) {
+                if(result.getObject(i) == null){
+                    break;
+                }else {
+                    LocalDateTime time = LocalDateTime.parse(result.getString(i).replace(" ", "T"));
                     hours.addTime(time);
                 }
             }
-        } catch (
-                SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }connection.close();
+        }
+        connection.close();
         return hours;
     }
 }
