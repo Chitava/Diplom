@@ -242,7 +242,7 @@ public class ImplementWorkerService implements WorkerService {
                         }
                     }
                 } catch (NumberFormatException e) {
-                    number=16;
+                    number = 16;
                     for (int j = 3; j < lastCell - 1; j++) {
                         String fullTime = String.valueOf(row.getCell(j));
                         LocalDateTime time = addTime(fullTime, number);
@@ -328,6 +328,7 @@ public class ImplementWorkerService implements WorkerService {
 
     /**
      * Метод расчета заработной платы
+     *
      * @param hours
      * @return
      */
@@ -341,7 +342,7 @@ public class ImplementWorkerService implements WorkerService {
         String verificationDays = ""; //переменная для проверки выходной или нет сверяемся со списком полученных
         // праздников
         LocalDateTime verificationData = LocalDateTime.of(Integer.parseInt(temp[0]),
-                Integer.parseInt(temp[1]),1,0,0);
+                Integer.parseInt(temp[1]), 1, 0, 0);
         int workDays = 0;
         int overDays = 0;
         double salary = 0;
@@ -396,15 +397,29 @@ public class ImplementWorkerService implements WorkerService {
                         salary = salary + worker.getPaymentInDay();
                         overSalary = overSalary + (dayTime - 9) * worker.getPaymentInHour();
                         overDays++;
-                    }else {
+                    } else {
                         salary = salary + worker.getPaymentInDay();
                     }
                 }
-            }verificationData = verificationData.plusDays(1);
+            }
+            verificationData = verificationData.plusDays(1);
             fullSalary = salary + overSalary;
         }
-        return new MonthSalary(worker.getId(), worker.getName(), workDays, overDays, Math.round(salary*100/100),
-                Math.round(overSalary*100/100), 0, Math.round(fullSalary*100/100));
+        return new MonthSalary(worker.getId(), worker.getName(), workDays, overDays, Math.round(salary * 100 / 100),
+                Math.round(overSalary * 100 / 100), 0, Math.round(fullSalary * 100 / 100));
     }
 
+    public ArrayList<MonthSalary> getAllWorkersSalaryInMonth(String tableName) throws SQLException {
+        List<String> allWorkersId = repository.findAllIdWorker();
+        ArrayList<MonthSalary> result = new ArrayList<>();
+        for (String id : allWorkersId) {
+            if (repository.findById(Long.valueOf(id)).isPresent()) {
+                Worker worker = (repository.findById(Long.valueOf(id)).get());
+                workedHours = jdbc.getAllMonthTimes(worker, tableName);
+                MonthSalary salary = salaryCalculation(workedHours);
+                result.add(salary);
+            }
+        }
+        return result;
+    }
 }

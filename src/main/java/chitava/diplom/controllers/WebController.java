@@ -27,7 +27,7 @@ public class WebController {
 
     private final WorkerService service;
     private final JDBCService jdbc;
-    private MonthAllWorkersHours allMonthHours;
+
 
 
 //    private final OneWorkedHours workedHours;
@@ -314,28 +314,24 @@ public class WebController {
      */
 
     @GetMapping("/calcall")
-    public String allWorkersSallary(Model model) throws SQLException, IOException {
+    public String allWorkersSallary(Model model) throws SQLException {
         Collection<Worker> workers = service.getAllWorkers();
-        ArrayList<MonthSalary> allMonthsalary = new ArrayList<>();
         if (EstimatedDate.dateForHTML == "не установлена") {
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
             model.addAttribute("message", "Вы не установили дату расчета");
             return "result";
         }else {
-            allMonthHours = service.getMonthTimes(EstimatedDate.dateForDB);
-            ArrayList<WorkedHours> list = allMonthHours.getMonthAllHours();
-            for (int i = 0; i < list.size(); i++) {
-                MonthSalary monthSalary = service.salaryCalculation(list.get(i));
-                monthSalary.setWorkerId(list.get(i).getWorker().getId());
-                monthSalary.setWorkerName(list.get(i).getWorker().getName());
-                allMonthsalary.add(monthSalary);
+            double fullPayment=0;
+            ArrayList<MonthSalary> allMonthsalary = service.getAllWorkersSalaryInMonth(EstimatedDate.dateForDB);
+            for (MonthSalary salary: allMonthsalary) {
+                fullPayment = fullPayment + salary.getFullSalary();
             }
             model.addAttribute("allsalary", allMonthsalary);
             workers = service.getAllWorkers();
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
-
+            model.addAttribute("fullpayment", fullPayment);
             return "allsalary";
         }
     }
