@@ -3,7 +3,7 @@ package chitava.diplom.services.implServices;
 import chitava.diplom.models.EstimatedDate;
 import chitava.diplom.models.MonthSalary;
 import chitava.diplom.services.SendTo;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import jdk.internal.access.JavaIOFileDescriptorAccess;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
@@ -12,8 +12,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ExcelSender implements SendTo {
@@ -42,42 +44,42 @@ public class ExcelSender implements SendTo {
                 cell.setCellValue(rowIndex);
                 rowIndex++;
                 colIndex++;
-                    cell = row.createCell(colIndex);
-                    cell.setCellValue(salary.getWorkerName());//Имя сотрудника
-                    colIndex++;
-                    cell = row.createCell(colIndex);
-                    cell.setCellValue(salary.getWorkDays());//Количество отработанных дней
-                    colIndex++;
-                    cell = row.createCell(colIndex);
-                    cell.setCellValue(salary.getHollydays());//Кличество выходных и праздников
-                    colIndex++;
-                    cell = row.createCell(colIndex);
-                    cell.setCellValue(salary.getOverTimes());//Время переработки
-                    colIndex++;
-                    cell = row.createCell(colIndex);
-                    cell.setCellValue(salary.getSalary());//Зарплата за основоное время
-                    colIndex++;
-                    cell = row.createCell(colIndex);
-                    cell.setCellValue(salary.getOverSalary());//Зарплата за переработку
-                    colIndex++;
-                    cell = row.createCell(colIndex);
-                    cell.setCellValue(salary.getFullSalary());//Полная зарплата
-                    colIndex++;
-                    cell = row.createCell(colIndex);
-                    cell.setCellValue(0.0);//аванс
-                    colIndex++;
-                    cell = row.createCell(colIndex);
-                    cell.setCellFormula("H" + rowIndex + "-" + "I" + rowIndex);
+                cell = row.createCell(colIndex);
+                cell.setCellValue(salary.getWorkerName());//Имя сотрудника
+                colIndex++;
+                cell = row.createCell(colIndex);
+                cell.setCellValue(salary.getWorkDays());//Количество отработанных дней
+                colIndex++;
+                cell = row.createCell(colIndex);
+                cell.setCellValue(salary.getHollydays());//Кличество выходных и праздников
+                colIndex++;
+                cell = row.createCell(colIndex);
+                cell.setCellValue(salary.getOverTimes());//Время переработки
+                colIndex++;
+                cell = row.createCell(colIndex);
+                cell.setCellValue(salary.getSalary());//Зарплата за основоное время
+                colIndex++;
+                cell = row.createCell(colIndex);
+                cell.setCellValue(salary.getOverSalary());//Зарплата за переработку
+                colIndex++;
+                cell = row.createCell(colIndex);
+                cell.setCellValue(salary.getFullSalary());//Полная зарплата
+                colIndex++;
+                cell = row.createCell(colIndex);
+                cell.setCellValue(0.0);//аванс
+                colIndex++;
+                cell = row.createCell(colIndex);
+                cell.setCellFormula("H" + rowIndex + "-" + "I" + rowIndex);
 
                 book.write(new FileOutputStream(file));
                 book.write(stream);
 
             }
-            try{
+            try {
 
-                if(stream!=null)
+                if (stream != null)
                     stream.close();
-            }catch (Exception e){
+            } catch (Exception e) {
                 return e.getMessage();
             }
 
@@ -85,9 +87,6 @@ public class ExcelSender implements SendTo {
             return e.getMessage();
 
         }
-        String name = file.getPath();
-
-        return name;
     }
 
 
