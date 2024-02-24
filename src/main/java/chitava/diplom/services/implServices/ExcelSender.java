@@ -3,30 +3,33 @@ package chitava.diplom.services.implServices;
 import chitava.diplom.models.EstimatedDate;
 import chitava.diplom.models.MonthSalary;
 import chitava.diplom.services.SendTo;
-import jdk.internal.access.JavaIOFileDescriptorAccess;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
+
 
 @Service
+@ConfigurationProperties
 public class ExcelSender implements SendTo {
+
+    @Value("${URL_SAVE}")
+    private  String URL_SAVE;
 
     @Override
     public String sendTo(ArrayList<MonthSalary> salarys) throws IOException {
 
         int rowIndex = 1;
         Row row;
-        Files.createDirectories(Paths.get("d:/Inbulk/"));
-        File file = new File("d:/Inbulk/Зарплата за " + EstimatedDate.dateForHTML + ".xls");
+        Files.createDirectories(Paths.get(URL_SAVE));
+        File file = new File(URL_SAVE + EstimatedDate.dateForHTML + ".xls");
         String[] nameCol = {"№", "ФИО", "Отработано дней", "Выходные и праздники", "Часов переработки", "Зарплата за дни",
                 "Зарплата за переработку", "Зарплата за месяц", "Аванс", "Итого на руки"};
         try (FileOutputStream stream = new FileOutputStream(file)) {
@@ -87,8 +90,8 @@ public class ExcelSender implements SendTo {
             return e.getMessage();
 
         }
+        return "";
     }
-
 
 }
 

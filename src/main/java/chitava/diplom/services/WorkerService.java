@@ -1,6 +1,5 @@
 package chitava.diplom.services;
 
-import chitava.diplom.models.MonthAllWorkersHours;
 import chitava.diplom.models.MonthSalary;
 import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
@@ -8,8 +7,7 @@ import chitava.diplom.models.Worker;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Интерфейс для работы с классом сотрудников в базе данных
@@ -94,4 +92,13 @@ public interface WorkerService {
      */
     String saveTo(ArrayList<MonthSalary> salarys) throws IOException;
 
+    /**
+     * Метод получения данных посещений конкретного сотрудника в конкретный месяц
+     *
+     * @param tableName месяц
+     * @param id        идентификатор сотрудника
+     * @return список времени посещений
+     * @throws SQLException
+     */
+    Map<String, List> getMonthTimes(String tableName, Long id) throws SQLException;
 }

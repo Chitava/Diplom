@@ -16,12 +16,6 @@ import java.util.ArrayList;
 
 public interface JDBCService {
 
-    /**
-     * Установка соединения с базой данных
-     * @return
-     */
-    Connection getConnection();
-
 
     /**
      * Метод создание таблицы в зависимости от месяца расчета

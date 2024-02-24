@@ -1,6 +1,7 @@
 package chitava.diplom.controllers;
 import chitava.diplom.models.EstimatedDate;
 import chitava.diplom.models.Worker;
+import chitava.diplom.services.JDBCService;
 import chitava.diplom.services.WorkerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
@@ -13,6 +14,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class ExeptionController {
     private final WorkerService service;
+    private final JDBCService jdbc;
 
     @ExceptionHandler({SQLSyntaxErrorException.class})
     protected String SQLSyntaxErrorException(Model model) {

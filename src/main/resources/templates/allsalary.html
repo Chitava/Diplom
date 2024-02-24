@@ -36,7 +36,12 @@
             </div>
               <div th:case="*">
                 <form th:action="@{'/inbulk/prepayment/' + ${a.workerId}}" method="post">
-                  <td th:text="${a.workerName}" ></td>
+                  <td >
+                    <a th:href="@{'/inbulk/info/' + ${a.workerId}}">
+                      <span th:text="${a.workerName}">
+                      </span>
+                    </a>
+                  </td>
                   <td th:text="${a.workDays}"></td>
                   <td th:text="${a.hollydays}"></td>
                   <td th:text="${a.overTimes}"></td>
@@ -66,8 +71,8 @@
             <td></td>
             <td></td>
             <td></td>
-            <td style="font-weight: bold;" th:text="${fullpayment}"></td>
             <td></td>
+            <td style="font-weight: bold;" th:text="${fullpayment}"></td>
           </tr>
           </tbody>
         </table>

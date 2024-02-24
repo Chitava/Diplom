@@ -3,15 +3,29 @@ package chitava.diplom.controllers;
 import chitava.diplom.models.*;
 import chitava.diplom.services.WorkerService;
 import lombok.RequiredArgsConstructor;
+import netscape.javascript.JSObject;
+import org.apache.commons.io.IOUtils;
+import org.apache.tomcat.util.json.JSONParser;
+import org.aspectj.apache.bcel.classfile.annotation.NameValuePair;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Класс обработчик HTTP запросов работы с записями сотрудников
@@ -340,9 +354,33 @@ public class WebController {
         model.addAttribute("workers", workers);
         model.addAttribute("message", "Данные успешно сохранены " + message);
         return "result";
-
     }
+
+    @GetMapping("/info/{id}")
+    public String getMonthInfo(@PathVariable("id") Long id, Model model) throws SQLException {
+        Map times = service.getMonthTimes(EstimatedDate.dateForDB, id);
+        getAllWorkers();
+        for (Worker worker: workers) {
+            if (id.equals(worker.getId())){
+                model.addAttribute("name", worker.getName());
+                break;
+            }
+        }
+        model.addAttribute("monthtimes", times);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("workers", workers);
+        return "monthinfo";
+    }
+
+    @PostMapping("/save")
+    public String editTimes(@ModelAttribute("day") Temp times) {
+        System.out.println(times);
+        return "index";
+    }
+
 }
+
+
 
 
 

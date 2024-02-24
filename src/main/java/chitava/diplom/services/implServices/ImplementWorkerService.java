@@ -12,6 +12,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -20,10 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static chitava.diplom.models.Hollydays.yearHolidays;
@@ -37,8 +36,10 @@ import static org.apache.commons.math3.util.Precision.round;
 @Service
 @AllArgsConstructor
 @NoArgsConstructor
+@ConfigurationProperties
 public class ImplementWorkerService implements WorkerService {
-
+    @Value("${URL_SAVE}")
+    private  String URL_SAVE;
 
     private Worker worker;
     private WorkedHours workedHours;
@@ -293,53 +294,63 @@ public class ImplementWorkerService implements WorkerService {
         }
     }
 
-
-//    public LocalDateTime addTime(String times, int day) {
-//        LocalDateTime time = null;
-//        if (!times.equals("--\n--\n--") && times.length() > 0) {
-//            String[] str = times.split("\n");
-//            int comeHour = Integer.parseInt(str[0].substring(0, str[0].indexOf(":")));
-//            int comeMinute = Integer.parseInt(str[0].substring(str[0].indexOf(":") + 1));
-//            int leftHour = Integer.parseInt(str[1].substring(0, str[1].indexOf(":")));
-//            int leftMinute = Integer.parseInt(str[1].substring(str[1].indexOf(":") + 1));
-//            LocalTime comeWork = LocalTime.of(comeHour, comeMinute);
-//            LocalTime leftWork = LocalTime.of(leftHour, leftMinute);
-//            if (comeWork.compareTo(leftWork) > 0) {
-//                LocalTime fullDay = LocalTime.of(00, 00);
-//                LocalTime addTime = fullDay.minusHours(comeHour)
-//                        .minusMinutes(comeMinute)
-//                        .plusHours(leftHour)
-//                        .plusMinutes(leftMinute);
-//                time = LocalDateTime.of(2024, 1, day, addTime.getHour(), addTime.getMinute());
-//            } else {
-//                int hour = Integer.parseInt(str[2].substring(0, str[2].indexOf(":")));
-//                int minute = Integer.parseInt(str[2].substring(str[2].indexOf(":") + 1));
-//                time = LocalDateTime.of(2024, 1, day, hour, minute);
-//            }
-//        } else {
-//            time = LocalDateTime.of(2024, 1, day, 0, 0);
-//        }
-//        workedHours.addTime(time);
-//        return time;
-//    }
-
     /**
-     * Метод получения данных посещений всех сотрудников за определеннный месяц
+     * Метод получения данных посещений конкретного сотрудника в конкретный месяц
      *
-     * @param tableName
-     * @return
+     * @param tableName месяц
+     * @param id        идентификатор сотрудника
+     * @return список времени посещений
+     * @throws SQLException
      */
-    public MonthAllWorkersHours getMonthTimes(String tableName) throws SQLException {
-        monthAllWorkersHours = new MonthAllWorkersHours();
-        ArrayList<Long> ids = jdbc.selectAllIdInMonth(tableName);
-        WorkedHours monthTimes = new WorkedHours();
-        for (Long id : ids) {
-            Worker worker = repository.findById(id).get();
-            monthTimes.setWorker(worker);
-            monthTimes = jdbc.getAllMonthTimes(worker, tableName);
-            monthAllWorkersHours.addWorkedHours(monthTimes);
+    public Map<String, List> getMonthTimes(String tableName, Long id) throws SQLException {
+        Map<String, List> times = new TreeMap<>();
+        String[] temp = new StringBuilder(EstimatedDate.dateForDB.replace("times_", ""))
+                .toString().split("_");
+        String monthYears = new StringBuilder(".").append(temp[1]).append(".").append(temp[0]).toString();
+        //получаем дату месяц.год
+        Worker worker;
+        Optional<Worker> optionalWorker = repository.findById(id);
+        if (optionalWorker.isPresent()){
+            worker = optionalWorker.get();
+        }else {
+            throw new RuntimeException();
         }
-        return monthAllWorkersHours;
+        WorkedHours workedHours = jdbc.getAllMonthTimes(worker, EstimatedDate.dateForDB);
+        List<LocalDateTime> hour = workedHours.getTimes();
+        String verificationDays = ""; //переменная для проверки выходной или нет сверяемся со списком полученных
+        // праздников
+        LocalDateTime verificationData = LocalDateTime.of(Integer.parseInt(temp[0]),
+                Integer.parseInt(temp[1]), 1, 0, 0);
+        for (int i = 0; i < hour.size(); i++) {
+            String day = String.valueOf(i + 1);
+            String key ="";
+            if (i <= 8) {
+                key = "0" + String.valueOf(i+1);
+            } else {
+                key = String.valueOf(i+1);
+            }
+            if (i < 10) {
+                verificationDays = "0" + day + monthYears;
+            } else {
+                verificationDays = day + monthYears;
+            }
+            double dayTime = 0;
+            String dayHour = String.valueOf(hour.get(i).getHour());
+            String dayMinute = String.valueOf(hour.get(i).getMinute());
+            if (hour.get(i).getMinute() < 10) {
+                dayTime = Double.parseDouble(dayHour + ".0" + dayMinute);
+            } else {
+                dayTime = Double.parseDouble(dayHour + "." + dayMinute);
+            }
+            if (yearHolidays.contains(String.valueOf(verificationDays)) || String.valueOf(verificationData.getDayOfWeek()) ==
+                            "SATURDAY" || String.valueOf(verificationData.getDayOfWeek()) == "SUNDAY") {
+                times.put(key, Arrays.asList(dayTime, true));
+            }else {
+                times.put(key, Arrays.asList(dayTime, false));
+            }
+            verificationData = verificationData.plusDays(1);
+        }
+        return times;
     }
 
     /**

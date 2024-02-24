@@ -308,6 +308,10 @@ header{
   border-collapse: separate;
 }
 
+thead{
+height:30px
+}
+
 thead tr {
   border-collapse: separate;
   font-family: "Comforta";
@@ -326,12 +330,21 @@ td {
   height: 58px;
 }
 
+.info__td{
+height: 24px;
+border-radius: 10px;}
+
 .all__buttons {
   margin-top: 20px;
 }
 
 .recalculation {
   width: 60px;
+}
+
+.recalculation__time{
+    width: 40px;
+    align-text: center;
 }
 
 .recalculation__button {
