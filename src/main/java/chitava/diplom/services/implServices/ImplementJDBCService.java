@@ -129,8 +129,9 @@ public class ImplementJDBCService implements JDBCService {
         hours.setWorker(worker);
         Statement statement = connect.createStatement();
         ResultSet result = statement.executeQuery(query);
+        int columns = result.getMetaData().getColumnCount();
         while(result.next()) {
-            for (int i = 2; i < 33; i++) {
+            for (int i = 2; i <= columns; i++) {
                 if(result.getObject(i) == null){
                     break;
                 }else {

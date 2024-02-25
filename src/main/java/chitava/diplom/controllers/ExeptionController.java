@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.io.IOException;
+import java.sql.SQLException;
 import java.sql.SQLSyntaxErrorException;
 import java.util.Collection;
 
@@ -25,5 +28,28 @@ public class ExeptionController {
                 + " не обнаружены");
         return "result";
     }
+
+
+    @ExceptionHandler({StringIndexOutOfBoundsException.class})
+    protected String dateError(Model model) {
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("workers", workers);
+        model.addAttribute("message", "Не выбрана расчетная дата");
+        return "result";
+    }
+
+    @ExceptionHandler({IOException.class})
+    protected String IoError(Model model) {
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("workers", workers);
+        model.addAttribute("message", "Ошибка сохранения данных");
+        return "result";
+    }
+
+
+
+
 }
 

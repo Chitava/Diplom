@@ -7,22 +7,20 @@
     <div th:insert= "~{index :: menu}"></div>
     <section class="resultfield">
         <div class="h1">
-            <h1>Данные за <span th:text="${estimatedDate}"></span> <span th:text="${name}"></span></h1>
+            <h1>Данные за <span th:text="${estimatedDate}"></span> <span th:text="${name}" ></span></h1>
         </div>
         <div class="table__border">
-            <form th:action="@{/inbulk/save}" method="post" th:object = "${monthtimes}">
+            <form th:action="@{'/inbulk/save/' + ${id}}" method="post">
                 <table class="table">
                     <thead>
                     <tr>
                         <td class="info__td" th:each="day : ${monthtimes}" th:text="${day.key}" th:style="${day.value[1]} ? 'background:#409647;' : 'background: #ffffff;'"></td>
-
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
-                        <td class="td__info" type="text" th:each="day : ${monthtimes}">
-
-                            <input class="recalculation__time" type="number" th:value="${day.value[0]}" /> ч.
+                        <td class="td__info" type="text" th:each="day : ${monthtimes}" th:object="${edittimes}">
+                            <input class="recalculation__time" step="0.01" min="0" type="number"  th:name = "edittime + (${day.key}-1)" th:value="${day.value[0]}" /> ч.
                         </td>
                     </tr>
                     </tbody>

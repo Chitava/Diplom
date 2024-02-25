@@ -1,6 +1,7 @@
 package chitava.diplom.services;
 
 import chitava.diplom.models.MonthSalary;
+import chitava.diplom.models.MonthTime;
 import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
 
@@ -101,4 +102,12 @@ public interface WorkerService {
      * @throws SQLException
      */
     Map<String, List> getMonthTimes(String tableName, Long id) throws SQLException;
+
+
+    /**
+     * Метод обновления данных посещений конкретного сотрудника
+     * @param times
+     * @param id
+     */
+    public void updateTimes(MonthTime times, Long id) throws SQLException;
 }

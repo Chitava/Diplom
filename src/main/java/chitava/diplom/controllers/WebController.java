@@ -2,9 +2,12 @@ package chitava.diplom.controllers;
 
 import chitava.diplom.models.*;
 import chitava.diplom.services.WorkerService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import netscape.javascript.JSObject;
 import org.apache.commons.io.IOUtils;
+import org.apache.poi.ss.usermodel.Header;
 import org.apache.tomcat.util.json.JSONParser;
 import org.aspectj.apache.bcel.classfile.annotation.NameValuePair;
 import org.springframework.http.HttpEntity;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -360,23 +364,32 @@ public class WebController {
     public String getMonthInfo(@PathVariable("id") Long id, Model model) throws SQLException {
         Map times = service.getMonthTimes(EstimatedDate.dateForDB, id);
         getAllWorkers();
+        MonthTime edittimes = new MonthTime();
         for (Worker worker: workers) {
             if (id.equals(worker.getId())){
                 model.addAttribute("name", worker.getName());
+                model.addAttribute("id", worker.getId());
                 break;
             }
         }
+        model.addAttribute("edittimes", edittimes);
         model.addAttribute("monthtimes", times);
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         return "monthinfo";
     }
 
-    @PostMapping("/save")
-    public String editTimes(@ModelAttribute("day") Temp times) {
-        System.out.println(times);
-        return "index";
-    }
+    @PostMapping("/save/{id}")
+     protected void printRequest(@PathVariable("id") Long id, MonthTime times, HttpServletResponse httpServletResponse) throws SQLException {
+
+        service.updateTimes(times, id);
+        httpServletResponse.setHeader("Location", "http://localhost:8080/inbulk/calcall");
+        httpServletResponse.setStatus(302);
+
+        }
+
+
+
 
 }
 

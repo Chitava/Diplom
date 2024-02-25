@@ -18,10 +18,10 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -467,6 +467,43 @@ public class ImplementWorkerService implements WorkerService {
     public String saveTo(ArrayList<MonthSalary> salarys) throws IOException {
         String message = send.sendTo(salarys);
         return message;
+    }
+
+    /**
+     * Метод обновления значений времени поещения конкретного сотрудника
+     * @param times
+     * @param id
+     * @throws SQLException
+     */
+    public void updateTimes(MonthTime times, Long id) throws SQLException {
+        ArrayList<Double> newDoubleTimes = times.getAll();
+        ArrayList<LocalTime> newTime = new ArrayList<>();
+        for (Double time: newDoubleTimes) {
+            int hour = Integer.parseInt(String.valueOf(time).substring(0, String.valueOf(time).indexOf(".")));
+            int minute = Integer.parseInt(String.valueOf(time).substring(String.valueOf(time).indexOf(".")+1));
+            newTime.add(LocalTime.of(hour, minute));
+        }
+        Worker worker;
+        Optional<Worker> optionalWorker = repository.findById(id);
+        if (optionalWorker.isPresent()){
+            worker = optionalWorker.get();
+        }else {
+            throw new RuntimeException();
+        }
+        WorkedHours hours = jdbc.getAllMonthTimes(worker, EstimatedDate.dateForDB);
+        for (int i = 0; i < hours.getTimes().size(); i++) {
+            if(!LocalTime.from(hours.getTime(i)).equals(newTime.get(i))){
+                LocalDateTime now = hours.getTime(i);
+                LocalDateTime newDate = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(),
+                        newTime.get(i).getHour(), newTime.get(i).getMinute());
+                jdbc.addTime(EstimatedDate.dateForDB,  String.valueOf(id), i+1, newDate);
+            }
+
+        }
+        
+                
+        
+
     }
 
 }
