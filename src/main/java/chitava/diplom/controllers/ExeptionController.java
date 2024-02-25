@@ -1,4 +1,5 @@
 package chitava.diplom.controllers;
+
 import chitava.diplom.models.EstimatedDate;
 import chitava.diplom.models.Worker;
 import chitava.diplom.services.JDBCService;
@@ -47,6 +48,16 @@ public class ExeptionController {
         model.addAttribute("message", "Ошибка сохранения данных");
         return "result";
     }
+
+    @ExceptionHandler({RuntimeException.class})
+    protected String dataError(Model model) {
+        Collection<Worker> workers = service.getAllWorkers();
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("workers", workers);
+        model.addAttribute("message", new RuntimeException().getMessage());
+        return "result";
+    }
+
 
 
 

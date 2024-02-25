@@ -66,7 +66,6 @@ public class WebController {
         getAllWorkers();
         model.addAttribute("workers", workers);
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
-
         return "index";
     }
 
@@ -163,10 +162,17 @@ public class WebController {
      */
     @GetMapping("/del")
     public String delWorker(Model model) {
-        getAllWorkers();
-        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
-        model.addAttribute("workers", workers);
-        return "delworker";
+        if (EstimatedDate.dateForHTML == "не установлена") {
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+            model.addAttribute("workers", workers);
+            model.addAttribute("message", "Вы не установили дату расчета");
+            return "result";
+        } else {
+            getAllWorkers();
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+            model.addAttribute("workers", workers);
+            return "delworker";
+        }
     }
 
     /**
