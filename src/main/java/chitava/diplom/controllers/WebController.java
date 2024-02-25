@@ -371,8 +371,8 @@ public class WebController {
         Map times = service.getMonthTimes(EstimatedDate.dateForDB, id);
         getAllWorkers();
         MonthTime edittimes = new MonthTime();
-        for (Worker worker: workers) {
-            if (id.equals(worker.getId())){
+        for (Worker worker : workers) {
+            if (id.equals(worker.getId())) {
                 model.addAttribute("name", worker.getName());
                 model.addAttribute("id", worker.getId());
                 break;
@@ -385,18 +385,117 @@ public class WebController {
         return "monthinfo";
     }
 
-    @PostMapping("/save/{id}")
-     protected void printRequest(@PathVariable("id") Long id, MonthTime times, HttpServletResponse httpServletResponse) throws SQLException {
 
+    /**
+     * Обработка запроса на обновление данных посещения сотрудника, редирект на страницу расчета всех сотрудников
+     *
+     * @param id
+     * @param times
+     * @param httpServletResponse
+     * @throws SQLException
+     */
+    @PostMapping("/save/{id}")
+    protected void printRequest(@PathVariable("id") Long id, MonthTime times, HttpServletResponse httpServletResponse) throws SQLException {
         service.updateTimes(times, id);
         httpServletResponse.setHeader("Location", "http://localhost:8080/inbulk/calcall");
         httpServletResponse.setStatus(302);
+    }
 
+
+    @GetMapping("/calconeworker")
+    public String calcWorker(@ModelAttribute("selected") Long id, Model model) throws SQLException {
+        if (EstimatedDate.dateForHTML == "не установлена") {
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+            model.addAttribute("workers", workers);
+            model.addAttribute("message", "Вы не установили дату расчета");
+            return "result";
+        } else {
+            monthSalaries = service.getOneWorkersSalaryInMonth(EstimatedDate.dateForDB, id);
+            getAllWorkers();
+            model.addAttribute("allsalary", monthSalaries);
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+            model.addAttribute("workers", workers);
+            return "onesalary";
         }
+    }
+
+    @GetMapping("/calcone")
+    public String calcOneWorker(Model model) {
+        if (EstimatedDate.dateForHTML == "не установлена") {
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+            model.addAttribute("workers", workers);
+            model.addAttribute("message", "Вы не установили дату расчета");
+            return "result";
+        } else {
+            getAllWorkers();
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+            model.addAttribute("workers", workers);
+            return "calcone";
+        }
+    }
+
+    @PostMapping("/prepay/{id}")
+    public String prepaymentOne(@PathVariable("id") Long id, Double prepayment, Model model) {
+        for (MonthSalary oneWorkersalary : monthSalaries) {
+            if (oneWorkersalary.getWorkerId().equals(id)) {
+                oneWorkersalary.setFullSalary(oneWorkersalary.getFullSalary() - prepayment);
+                oneWorkersalary.setPrepayment(prepayment);
+            }
+        }
+        workers = service.getAllWorkers();
+        model.addAttribute("prepayment", prepayment);
+        model.addAttribute("allsalary", monthSalaries);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("allsalary", monthSalaries);
+        model.addAttribute("workers", workers);
+
+        return "onesalary";
+    }
 
 
+    @GetMapping("/infoone/{id}")
+    public String getMonthInfoForOne(@PathVariable("id") Long id, Model model) throws SQLException {
+        Map times = service.getMonthTimes(EstimatedDate.dateForDB, id);
+        getAllWorkers();
+        MonthTime edittimes = new MonthTime();
+        for (Worker worker : workers) {
+            if (id.equals(worker.getId())) {
+                model.addAttribute("name", worker.getName());
+                model.addAttribute("id", worker.getId());
+                break;
+            }
+        }
+        model.addAttribute("edittimes", edittimes);
+        model.addAttribute("monthtimes", times);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("workers", workers);
+        return "monthinfoone";
+    }
 
 
+    /**
+     * Обработка запроса на обновление данных посещения сотрудника, редирект на страницу расчета всех сотрудников
+     *
+     * @param id
+     * @param times
+     * @throws SQLException
+     */
+    @PostMapping("/saveone/{id}")
+    protected String saveOne(@PathVariable("id") Long id, MonthTime times, Model model) throws SQLException {
+        if (EstimatedDate.dateForHTML == "не установлена") {
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+            model.addAttribute("workers", workers);
+            model.addAttribute("message", "Вы не установили дату расчета");
+            return "result";
+        } else {
+            monthSalaries = service.getOneWorkersSalaryInMonth(EstimatedDate.dateForDB, id);
+            getAllWorkers();
+            model.addAttribute("allsalary", monthSalaries);
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+            model.addAttribute("workers", workers);
+            return "onesalary";
+        }
+    }
 }
 
 
