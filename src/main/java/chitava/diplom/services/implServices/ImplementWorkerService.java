@@ -18,6 +18,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -39,7 +40,7 @@ import static org.apache.commons.math3.util.Precision.round;
 @ConfigurationProperties
 public class ImplementWorkerService implements WorkerService {
     @Value("${URL_SAVE}")
-    private  String URL_SAVE;
+    private String URL_SAVE;
 
     private Worker worker;
     private WorkedHours workedHours;
@@ -248,7 +249,7 @@ public class ImplementWorkerService implements WorkerService {
                     addTimesInWorkedHours(fullTime, workedHours);
                 }
                 for (int k = 0; k < workedHours.getTimes().size(); k++) {
-                    jdbc.addTime(EstimatedDate.dateForDB, String.valueOf(workedHours.getWorker().getId()), k+1,
+                    jdbc.addTime(EstimatedDate.dateForDB, String.valueOf(workedHours.getWorker().getId()), k + 1,
                             workedHours.getTime(k));
                 }
             }
@@ -310,9 +311,9 @@ public class ImplementWorkerService implements WorkerService {
         //получаем дату месяц.год
         Worker worker;
         Optional<Worker> optionalWorker = repository.findById(id);
-        if (optionalWorker.isPresent()){
+        if (optionalWorker.isPresent()) {
             worker = optionalWorker.get();
-        }else {
+        } else {
             throw new RuntimeException();
         }
         WorkedHours workedHours = jdbc.getAllMonthTimes(worker, EstimatedDate.dateForDB);
@@ -323,11 +324,11 @@ public class ImplementWorkerService implements WorkerService {
                 Integer.parseInt(temp[1]), 1, 0, 0);
         for (int i = 0; i < hour.size(); i++) {
             String day = String.valueOf(i + 1);
-            String key ="";
+            String key = "";
             if (i <= 8) {
-                key = "0" + String.valueOf(i+1);
+                key = "0" + String.valueOf(i + 1);
             } else {
-                key = String.valueOf(i+1);
+                key = String.valueOf(i + 1);
             }
             if (i < 10) {
                 verificationDays = "0" + day + monthYears;
@@ -343,9 +344,9 @@ public class ImplementWorkerService implements WorkerService {
                 dayTime = Double.parseDouble(dayHour + "." + dayMinute);
             }
             if (yearHolidays.contains(String.valueOf(verificationDays)) || String.valueOf(verificationData.getDayOfWeek()) ==
-                            "SATURDAY" || String.valueOf(verificationData.getDayOfWeek()) == "SUNDAY") {
+                    "SATURDAY" || String.valueOf(verificationData.getDayOfWeek()) == "SUNDAY") {
                 times.put(key, Arrays.asList(dayTime, true));
-            }else {
+            } else {
                 times.put(key, Arrays.asList(dayTime, false));
             }
             verificationData = verificationData.plusDays(1);
@@ -400,7 +401,7 @@ public class ImplementWorkerService implements WorkerService {
                     if (yearHolidays.contains(String.valueOf(verificationDays)) || String.valueOf(verificationData.getDayOfWeek()) ==
                             "SATURDAY" || String.valueOf(verificationData.getDayOfWeek()) == "SUNDAY") {
                         salary = salary + worker.getPeymentInHollydays();
-                        hollydays ++;
+                        hollydays++;
                     } else {
                         //если отработано менее 9 часов
                         if (dayTime < 9) {
@@ -417,8 +418,7 @@ public class ImplementWorkerService implements WorkerService {
                             salary = salary + worker.getPaymentInDay();
                         }
                     }
-                }
-                else {
+                } else {
                     if (dayTime < 9) {
                         salary = salary + (dayTime - 1) * paymentInSmallDayInHour;
                     } else if (dayTime > 9.20) {
@@ -435,12 +435,13 @@ public class ImplementWorkerService implements WorkerService {
         }
         MonthSalary monthSalary = new MonthSalary(worker.getId(), worker.getName(), workDays, hollydays,
                 round(overTimes, 2), round(salary, 2), round(overSalary, 2),
-                round(fullSalary,2));
+                round(fullSalary, 2));
         return monthSalary;
     }
 
     /**
      * Метод расчета зарплаты всех сотрудников
+     *
      * @param tableName Расчетный месяц
      * @return
      * @throws SQLException
@@ -459,8 +460,10 @@ public class ImplementWorkerService implements WorkerService {
         return result;
     }
 
-    /**\
+    /**
+     * \
      * Метод сохранения полученных данных при расчета зарплаты за месяц
+     *
      * @param salarys
      * @return
      */
@@ -471,6 +474,7 @@ public class ImplementWorkerService implements WorkerService {
 
     /**
      * Метод обновления значений времени поещения конкретного сотрудника
+     *
      * @param times
      * @param id
      * @throws SQLException
@@ -478,32 +482,43 @@ public class ImplementWorkerService implements WorkerService {
     public void updateTimes(MonthTime times, Long id) throws SQLException {
         ArrayList<Double> newDoubleTimes = times.getAll();
         ArrayList<LocalTime> newTime = new ArrayList<>();
-        for (Double time: newDoubleTimes) {
+        for (Double time : newDoubleTimes) {
             int hour = Integer.parseInt(String.valueOf(time).substring(0, String.valueOf(time).indexOf(".")));
-            int minute = Integer.parseInt(String.valueOf(time).substring(String.valueOf(time).indexOf(".")+1));
+            int minute = Integer.parseInt(String.valueOf(time).substring(String.valueOf(time).indexOf(".") + 1));
             newTime.add(LocalTime.of(hour, minute));
         }
         Worker worker;
         Optional<Worker> optionalWorker = repository.findById(id);
-        if (optionalWorker.isPresent()){
+        if (optionalWorker.isPresent()) {
             worker = optionalWorker.get();
-        }else {
+        } else {
             throw new RuntimeException();
         }
         WorkedHours hours = jdbc.getAllMonthTimes(worker, EstimatedDate.dateForDB);
         for (int i = 0; i < hours.getTimes().size(); i++) {
-            if(!LocalTime.from(hours.getTime(i)).equals(newTime.get(i))){
+            if (!LocalTime.from(hours.getTime(i)).equals(newTime.get(i))) {
                 LocalDateTime now = hours.getTime(i);
                 LocalDateTime newDate = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(),
                         newTime.get(i).getHour(), newTime.get(i).getMinute());
-                jdbc.addTime(EstimatedDate.dateForDB,  String.valueOf(id), i+1, newDate);
+                jdbc.addTime(EstimatedDate.dateForDB, String.valueOf(id), i + 1, newDate);
             }
-
         }
-        
-                
-        
-
     }
 
+    public WorkedHours getAllMonthTimes(Worker worker, String tableName) throws SQLException {
+        return jdbc.getAllMonthTimes(worker, tableName);
+    }
+
+    public ArrayList<MonthSalary> getOneWorkersSalaryInMonth(String tableName, Long id) throws SQLException {
+        ArrayList<MonthSalary> result = new ArrayList<>();
+        if (repository.findById(Long.valueOf(id)).isPresent()) {
+            Worker worker = (repository.findById(Long.valueOf(id)).get());
+            workedHours = jdbc.getAllMonthTimes(worker, tableName);
+            MonthSalary salary = salaryCalculation(workedHours);
+            result.add(salary);
+            }
+        return result;
+    }
 }
+
+

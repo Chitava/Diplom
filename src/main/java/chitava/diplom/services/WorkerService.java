@@ -110,4 +110,15 @@ public interface WorkerService {
      * @param id
      */
     public void updateTimes(MonthTime times, Long id) throws SQLException;
+
+    /**
+     * Метод получения данных посещения за месяц
+     * @param worker
+     * @param tableName
+     * @return
+     * @throws SQLException
+     */
+    public WorkedHours getAllMonthTimes (Worker worker, String tableName) throws SQLException;
+
+    public ArrayList<MonthSalary> getOneWorkersSalaryInMonth(String tableName, Long id) throws SQLException;
 }

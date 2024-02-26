@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:insert= "~{index :: head}"></head>
+<body>
+  <div th:insert= "~{index :: header}"></div>
+  <main class="workfield">
+    <div th:insert= "~{index :: menu}"></div>
+    <section class="resultfield">
+      <div class="h1">
+        <h1>Зарплата за <span th:text="${estimatedDate}"></span></h1>
+      </div>
+      <div class="table__border">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>ФИО</th>
+            <th>Отработано в месяце дней</th>
+            <th>Отработано в выходные</th>
+            <th>Время переработки</th>
+            <th>Зарплата за полные дни</th>
+            <th>Зарплата за переработку</th>
+            <th>Аванс</th>
+            <th>Итого за месяц</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="a: ${allsalary}">
+            <th:block th:switch="${a.workDays}">
+              <div th:case="0">
+                <td>
+                  <span th:text="${a.workerName}"></span>
+                </td>
+                <td>
+                  не работал в этом месяце
+                </td>
+            </div>
+              <div th:case="*">
+                <form th:action="@{'/inbulk/prepay/' + ${a.workerId}}" method="post">
+                  <td >
+                    <a th:href="@{'/inbulk/infoone/' + ${a.workerId}}">
+                      <span th:text="${a.workerName}">
+                      </span>
+                    </a>
+                  </td>
+                  <td th:text="${a.workDays}"></td>
+                  <td th:text="${a.hollydays}"></td>
+                  <td th:text="${a.overTimes}"></td>
+                  <td th:text="${a.salary}"><span> p.</span></td>
+                  <td th:text="${a.overSalary}"><span> р.</span></td>
+                  <td>
+                      <input th:sase="null" class="recalculation" type="number" min="0" name="prepayment"
+                             th:value="${a.prepayment}"/>
+                      <span>
+                        р.
+                      </span>
+                  </td>
+                  <td th:text="${a.fullSalary}"><span> р.</span></td>
+                  <td>
+                    <button class="button recalculation__button" type="submit">
+                      Пересчитать
+                    </button>
+                  </td>
+                </form>
+              </div>
+            </th:block>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">Итого за месяц</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="font-weight: bold;" th:text="${fullpayment}"></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <section class="all__buttons">
+        <a th:href="@{/inbulk/save}" class="button">Сохранить</a>
+      </section>
+    </section>
+    <div th:insert= "~{index :: workersmenu}"></div>
+  </main>
+</body>
+</html>
