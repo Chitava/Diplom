@@ -2,32 +2,13 @@ package chitava.diplom.controllers;
 
 import chitava.diplom.models.*;
 import chitava.diplom.services.WorkerService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import netscape.javascript.JSObject;
-import org.apache.commons.io.IOUtils;
-import org.apache.poi.ss.usermodel.Header;
-import org.apache.tomcat.util.json.JSONParser;
-import org.aspectj.apache.bcel.classfile.annotation.NameValuePair;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -42,11 +23,22 @@ public class WebController {
     /**
      * Сервис для работы с записями сотрудников
      */
-
     private final WorkerService service;
+
+    /**
+     * Список с зарплатой за месяц
+     */
     private ArrayList<MonthSalary> monthSalaries;
+
+    /**
+     * Список всех сотрудников
+     */
     private Collection<Worker> workers;
 
+
+    /**
+     * Метод получения всех сотрудников из БД
+     */
     private void getAllWorkers() {
         try {
             workers = service.getAllWorkers();
@@ -333,6 +325,13 @@ public class WebController {
         }
     }
 
+    /**
+     * Обработка запроса на перерасчет зарплаты за месяц с учетом аванса
+     * @param id
+     * @param prepayment
+     * @param model
+     * @return
+     */
     @PostMapping("/prepayment/{id}")
     public String prepayment(@PathVariable("id") Long id, Double prepayment, Model model) {
         double fullPayment = 0;
@@ -356,6 +355,12 @@ public class WebController {
     }
 
 
+    /**
+     * Метод обработки запроса на сохранение расчета зарплаты в файл
+     * @param model
+     * @return
+     * @throws IOException
+     */
     @GetMapping("/save")
     public String save(Model model) throws IOException {
         getAllWorkers();
@@ -366,6 +371,14 @@ public class WebController {
         return "result";
     }
 
+
+    /**
+     * Метод обработки запроса детальной информации посещения за месяц со страницы с расчетом всех сотрудников всех
+     * @param id
+     * @param model
+     * @return
+     * @throws SQLException
+     */
     @GetMapping("/info/{id}")
     public String getMonthInfo(@PathVariable("id") Long id, Model model) throws SQLException {
         Map times = service.getMonthTimes(EstimatedDate.dateForDB, id);
@@ -385,6 +398,13 @@ public class WebController {
         return "monthinfo";
     }
 
+    /**
+     * Метод обработки запроса сохранения изменений времени посещения сотрудником со страницы расчета всех сотрудников
+     * @param id
+     * @param times
+     * @param httpServletResponse
+     * @throws SQLException
+     */
     @PostMapping("/save/{id}")
      protected void printRequest(@PathVariable("id") Long id, MonthTime times, HttpServletResponse httpServletResponse) throws SQLException {
 
