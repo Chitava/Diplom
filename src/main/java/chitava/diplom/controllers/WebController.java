@@ -363,12 +363,12 @@ public class WebController {
      * @throws IOException
      */
     @GetMapping("/save")
-    public String save(Model model) throws IOException {
+    public String save(Model model, HttpServletResponse response) throws IOException {
         getAllWorkers();
-        String message = service.saveTo(monthSalaries);
+        service.saveTo(monthSalaries, response);
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
-        model.addAttribute("message", "Данные успешно сохранены " + message);
+        model.addAttribute("message", "Данные успешно сохранены");
         return "result";
     }
 

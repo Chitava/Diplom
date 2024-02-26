@@ -3,15 +3,24 @@ package chitava.diplom.services.implServices;
 import chitava.diplom.models.EstimatedDate;
 import chitava.diplom.models.MonthSalary;
 import chitava.diplom.services.SendTo;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
@@ -24,12 +33,12 @@ public class ExcelSender implements SendTo {
     private  String URL_SAVE;
 
     @Override
-    public String sendTo(ArrayList<MonthSalary> salarys) throws IOException {
+    public void sendTo(ArrayList<MonthSalary> salarys, HttpServletResponse response) throws IOException {
 
         int rowIndex = 1;
         Row row;
         Files.createDirectories(Paths.get(URL_SAVE));
-        File file = new File(URL_SAVE + EstimatedDate.dateForHTML + ".xls");
+        File file = new File("Зарплата за " + EstimatedDate.dateForHTML + ".xls");
         String[] nameCol = {"№", "ФИО", "Отработано дней", "Выходные и праздники", "Часов переработки", "Зарплата за дни",
                 "Зарплата за переработку", "Зарплата за месяц", "Аванс", "Итого на руки"};
         try (FileOutputStream stream = new FileOutputStream(file)) {
@@ -83,14 +92,24 @@ public class ExcelSender implements SendTo {
                 if (stream != null)
                     stream.close();
             } catch (Exception e) {
-                return e.getMessage();
+                throw new IOException("Ошибка сохранения файла");
             }
 
         } catch (IOException e) {
-            return e.getMessage();
-
+            throw new IOException("Ошибка сохранения файла");
         }
-        return "";
+        String contentType = Files.probeContentType(file.toPath());
+        if (contentType == null) {
+            contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        }
+        response.setContentType(contentType);
+        response.setContentLengthLong(Files.size(file.toPath()));
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
+                .filename(file.getName(), StandardCharsets.UTF_8)
+                .build()
+                .toString());
+        Files.copy(file.toPath(), response.getOutputStream());
+        response.flushBuffer();
     }
 
 }

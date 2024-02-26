@@ -5,6 +5,7 @@ import chitava.diplom.models.MonthTime;
 import chitava.diplom.models.WorkedHours;
 import chitava.diplom.models.Worker;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -91,7 +92,7 @@ public interface WorkerService {
      * @param salarys
      * @return
      */
-    String saveTo(ArrayList<MonthSalary> salarys) throws IOException;
+    void saveTo(ArrayList<MonthSalary> salarys, HttpServletResponse response) throws IOException;
 
     /**
      * Метод получения данных посещений конкретного сотрудника в конкретный месяц

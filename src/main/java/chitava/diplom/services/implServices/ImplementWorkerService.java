@@ -5,6 +5,7 @@ import chitava.diplom.models.*;
 import chitava.diplom.repositorys.WorkersRepository;
 import chitava.diplom.services.SendTo;
 import chitava.diplom.services.WorkerService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -467,9 +468,9 @@ public class ImplementWorkerService implements WorkerService {
      * @param salarys
      * @return
      */
-    public String saveTo(ArrayList<MonthSalary> salarys) throws IOException {
-        String message = send.sendTo(salarys);
-        return message;
+    public void saveTo(ArrayList<MonthSalary> salarys, HttpServletResponse response) throws IOException {
+        send.sendTo(salarys, response);
+
     }
 
     /**
