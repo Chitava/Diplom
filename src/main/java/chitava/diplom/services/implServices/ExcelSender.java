@@ -4,6 +4,7 @@ import chitava.diplom.models.EstimatedDate;
 import chitava.diplom.models.MonthSalary;
 import chitava.diplom.services.SendTo;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.io.FileUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -110,6 +111,8 @@ public class ExcelSender implements SendTo {
                 .toString());
         Files.copy(file.toPath(), response.getOutputStream());
         response.flushBuffer();
+        FileUtils.deleteDirectory(Paths.get(URL_SAVE).toFile());
+
     }
 
 }
