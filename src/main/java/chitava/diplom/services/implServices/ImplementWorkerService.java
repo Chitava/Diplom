@@ -374,6 +374,8 @@ public class ImplementWorkerService implements WorkerService {
                 Integer.parseInt(temp[1]), 1, 0, 0);
         int workDays = 0;
         double overTimes = 0;
+        double hollydayElaborTime = 0;
+        double hollydaySalary = 0;
         int hollydays = 0;
         double salary = 0;
         double overSalary = 0;
@@ -401,8 +403,17 @@ public class ImplementWorkerService implements WorkerService {
                     //проверка или праздничный день или выходной
                     if (yearHolidays.contains(String.valueOf(verificationDays)) || String.valueOf(verificationData.getDayOfWeek()) ==
                             "SATURDAY" || String.valueOf(verificationData.getDayOfWeek()) == "SUNDAY") {
-                        salary = salary + worker.getPeymentInHollydays();
-                        hollydays++;
+                        if (dayTime <= 6) {
+                            salary = salary + worker.getPeymentInHollydays();
+                            hollydays++;
+                        } else {
+                            salary = salary + worker.getPeymentInHollydays();
+                            overSalary = overSalary + (dayTime - 6) * worker.getPaymentInHour();
+                            overTimes = overTimes + (dayTime - 6);
+                            hollydaySalary = hollydaySalary + (dayTime - 6) * worker.getPaymentInHour();;
+                            hollydayElaborTime = hollydayElaborTime + (dayTime - 6);
+                            hollydays++;
+                        }
                     } else {
                         //если отработано менее 9 часов
                         if (dayTime < 9) {
@@ -436,7 +447,7 @@ public class ImplementWorkerService implements WorkerService {
         }
         MonthSalary monthSalary = new MonthSalary(worker.getId(), worker.getName(), workDays, hollydays,
                 round(overTimes, 2), round(salary, 2), round(overSalary, 2),
-                round(fullSalary, 2));
+                round(hollydayElaborTime, 2), round(hollydaySalary, 2), round(fullSalary, 2));
         return monthSalary;
     }
 

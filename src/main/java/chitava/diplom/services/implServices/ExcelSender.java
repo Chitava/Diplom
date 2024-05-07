@@ -41,7 +41,7 @@ public class ExcelSender implements SendTo {
         Files.createDirectories(Paths.get(URL_SAVE));
         File file = new File("Зарплата за " + EstimatedDate.dateForHTML + ".xls");
         String[] nameCol = {"№", "ФИО", "Отработано дней", "Выходные и праздники", "Часов переработки", "Зарплата за дни",
-                "Зарплата за переработку", "Зарплата за месяц", "Аванс", "Итого на руки"};
+                "Зарплата за переработку", "Время переработки в выходные", "Зарплата за переработку в выходные","Зарплата за месяц", "Аванс", "Итого на руки"};
         try (FileOutputStream stream = new FileOutputStream(file)) {
             Workbook book = new HSSFWorkbook();
             Sheet sheet = book.createSheet("Зарплата за +" + EstimatedDate.dateForHTML);
@@ -59,27 +59,43 @@ public class ExcelSender implements SendTo {
                 colIndex++;
                 cell = row.createCell(colIndex);
                 cell.setCellValue(salary.getWorkerName());//Имя сотрудника
+
                 colIndex++;
                 cell = row.createCell(colIndex);
                 cell.setCellValue(salary.getWorkDays());//Количество отработанных дней
+
                 colIndex++;
                 cell = row.createCell(colIndex);
                 cell.setCellValue(salary.getHollydays());//Кличество выходных и праздников
+
                 colIndex++;
                 cell = row.createCell(colIndex);
                 cell.setCellValue(salary.getOverTimes());//Время переработки
+
                 colIndex++;
                 cell = row.createCell(colIndex);
                 cell.setCellValue(salary.getSalary());//Зарплата за основоное время
+
                 colIndex++;
                 cell = row.createCell(colIndex);
                 cell.setCellValue(salary.getOverSalary());//Зарплата за переработку
+
+                colIndex++;
+                cell = row.createCell(colIndex);
+                cell.setCellValue(salary.getHollydayElaborTime());//Время переработки в выходные
+
+                colIndex++;
+                cell = row.createCell(colIndex);
+                cell.setCellValue(salary.getHollydaySalary());//Зарплата за переработку в выходные
+
                 colIndex++;
                 cell = row.createCell(colIndex);
                 cell.setCellValue(salary.getFullSalary());//Полная зарплата
+
                 colIndex++;
                 cell = row.createCell(colIndex);
                 cell.setCellValue(0.0);//аванс
+
                 colIndex++;
                 cell = row.createCell(colIndex);
                 cell.setCellFormula("H" + rowIndex + "-" + "I" + rowIndex);

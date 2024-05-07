@@ -409,10 +409,25 @@ public class WebController {
      * @throws SQLException
      */
     @PostMapping("/save/{id}")
-    protected void printRequest(@PathVariable("id") Long id, MonthTime times, HttpServletResponse httpServletResponse) throws SQLException {
+    protected String printRequest(@PathVariable("id") Long id, MonthTime times, HttpServletResponse httpServletResponse, Model model) throws SQLException {
         service.updateTimes(times, id);
-        httpServletResponse.setHeader("Location", "http://localhost:8080/inbulk/calcall");
-        httpServletResponse.setStatus(302);
+        Map time = service.getMonthTimes(EstimatedDate.dateForDB, id);
+        getAllWorkers();
+        MonthTime edittimes = new MonthTime();
+        for (Worker worker : workers) {
+            if (id.equals(worker.getId())) {
+                model.addAttribute("name", worker.getName());
+                model.addAttribute("id", worker.getId());
+                break;
+            }
+        }
+        model.addAttribute("edittimes", edittimes);
+        model.addAttribute("monthtimes", time);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("workers", workers);
+//        httpServletResponse.setHeader("Location", "http://localhost:8080/inbulk/calcall");
+//        httpServletResponse.setStatus(302);
+        return "monthinfo";
     }
 
 
