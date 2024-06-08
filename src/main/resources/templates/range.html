@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:insert= "~{index :: head}"></head>
+<body>
+  <div th:insert= "~{index :: header}"></div>
+  <main class="workfield">
+    <div th:insert= "~{index :: menu}"></div>
+    <section class="resultfield">
+      <h3>Выберите диапазон дату</h3>
+      <form class="estimated_form" th:action="@{/inbulk/calcall}"  method="post">
+        <h3 style="margin-top: 20px">Начальная дата</h3>
+        <input class="date" type="number" name="startDate" min="1" max="31">
+        <h3>Конечная дата</h3>
+        <input class="date" type="number" name="endDate" min="1" max="31">
+        <button class="button width">
+          Установить
+        </button>
+      </form>
+    </section>
+    <div th:insert= "~{index :: workersmenu}"></div>
+  </main>
+</body>
+</html>

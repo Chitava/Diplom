@@ -296,6 +296,23 @@ public class WebController {
     }
 
     /**
+     * Метод обработки запроса выбора интервала расчета зарплаты за определенный месяц
+     */
+
+    @GetMapping("/range")
+    public String cal(Model model) throws SQLException {
+        if (EstimatedDate.dateForHTML == "не установлена") {
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+            model.addAttribute("workers", workers);
+            model.addAttribute("message", "Вы не установили дату расчета");
+            return "result";
+        }
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("workers", workers);
+        return "range";
+    }
+
+    /**
      * Метод обработки запроса на расчет зарплаты всех сотрудников за определенный месяц
      *
      * @param model
@@ -304,26 +321,20 @@ public class WebController {
      * @throws IOException
      */
 
-    @GetMapping("/calcall")
-    public String allWorkersSallary(Model model) throws SQLException {
-        getAllWorkers();
-        if (EstimatedDate.dateForHTML == "не установлена") {
-            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
-            model.addAttribute("workers", workers);
-            model.addAttribute("message", "Вы не установили дату расчета");
-            return "result";
-        } else {
-            double fullPayment = 0;
-            monthSalaries = service.getAllWorkersSalaryInMonth(EstimatedDate.dateForDB);
-            for (MonthSalary salary : monthSalaries) {
-                fullPayment = fullPayment + salary.getFullSalary();
-            }
-            model.addAttribute("allsalary", monthSalaries);
-            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
-            model.addAttribute("workers", workers);
-            model.addAttribute("fullpayment", fullPayment);
-            return "allsalary";
+    @PostMapping("/calcall")
+    public String allWorkersSallary(@ModelAttribute("startDate") int startDate, @ModelAttribute("endDate") int endDate,
+                                    Model model) throws SQLException   {
+        double fullPayment = 0;
+        monthSalaries = service.getAllWorkersSalaryInMonth(EstimatedDate.dateForDB, startDate, endDate);
+        for (MonthSalary salary : monthSalaries) {
+            fullPayment = fullPayment + salary.getFullSalary();
         }
+        getAllWorkers();
+        model.addAttribute("allsalary", monthSalaries);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("workers", workers);
+        model.addAttribute("fullpayment", fullPayment);
+        return "allsalary";
     }
 
     /**
@@ -409,7 +420,8 @@ public class WebController {
      * @throws SQLException
      */
     @PostMapping("/save/{id}")
-    protected String printRequest(@PathVariable("id") Long id, MonthTime times, HttpServletResponse httpServletResponse, Model model) throws SQLException {
+    protected String printRequest(@PathVariable("id") Long id, MonthTime times, HttpServletResponse httpServletResponse,
+                                  Model model) throws SQLException {
         service.updateTimes(times, id);
         Map time = service.getMonthTimes(EstimatedDate.dateForDB, id);
         getAllWorkers();
@@ -432,14 +444,15 @@ public class WebController {
 
 
     @GetMapping("/calconeworker")
-    public String calcWorker(@ModelAttribute("selected") Long id, Model model) throws SQLException {
+    public String calcWorker(@ModelAttribute("selected") Long id, @ModelAttribute("startDate") int startDate,
+                             @ModelAttribute("endDate") int endDate,Model model) throws SQLException {
         if (EstimatedDate.dateForHTML == "не установлена") {
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
             model.addAttribute("message", "Вы не установили дату расчета");
             return "result";
         } else {
-            monthSalaries = service.getOneWorkersSalaryInMonth(EstimatedDate.dateForDB, id);
+            monthSalaries = service.getOneWorkersSalaryInMonth(EstimatedDate.dateForDB, id, startDate, endDate);
             getAllWorkers();
             model.addAttribute("allsalary", monthSalaries);
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
@@ -510,7 +523,9 @@ public class WebController {
      * @throws SQLException
      */
     @PostMapping("/saveone/{id}")
-    protected String saveOne(@PathVariable("id") Long id, MonthTime times, Model model) throws SQLException, IOException {
+    protected String saveOne(@PathVariable("id") Long id,@ModelAttribute("startDate") int startDate,
+                             @ModelAttribute("endDate") int endDate, MonthTime times, Model model)
+                throws SQLException, IOException {
         if (EstimatedDate.dateForHTML == "не установлена") {
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
@@ -518,7 +533,7 @@ public class WebController {
             return "result";
         } else {
             service.updateTimes(times, id);
-            monthSalaries = service.getOneWorkersSalaryInMonth(EstimatedDate.dateForDB, id);
+            monthSalaries = service.getOneWorkersSalaryInMonth(EstimatedDate.dateForDB, id, startDate, endDate);
             getAllWorkers();
             model.addAttribute("allsalary", monthSalaries);
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);

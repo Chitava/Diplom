@@ -361,13 +361,13 @@ public class ImplementWorkerService implements WorkerService {
      * @param hours
      * @return
      */
-    public MonthSalary salaryCalculation(WorkedHours hours) {
+    public MonthSalary salaryCalculation(WorkedHours hours, int startDate, int endDate)  {
         String[] temp = new StringBuilder(EstimatedDate.dateForDB.replace("times_", ""))
                 .toString().split("_");
         String monthYears = new StringBuilder(".").append(temp[1]).append(".").append(temp[0]).toString();
         //получаем дату месяц.год
         Worker worker = hours.getWorker();
-        List<LocalDateTime> hour = hours.getTimes();
+        List<LocalDateTime> hour = hours.getTimes(startDate, endDate);
         String verificationDays = ""; //переменная для проверки выходной или нет сверяемся со списком полученных
         // праздников
         LocalDateTime verificationData = LocalDateTime.of(Integer.parseInt(temp[0]),
@@ -458,14 +458,14 @@ public class ImplementWorkerService implements WorkerService {
      * @return
      * @throws SQLException
      */
-    public ArrayList<MonthSalary> getAllWorkersSalaryInMonth(String tableName) throws SQLException {
+    public ArrayList<MonthSalary> getAllWorkersSalaryInMonth(String tableName, int startDate, int endDate) throws SQLException  {
         List<String> allWorkersId = repository.findAllIdWorker();
         ArrayList<MonthSalary> result = new ArrayList<>();
         for (String id : allWorkersId) {
             if (repository.findById(Long.valueOf(id)).isPresent()) {
                 Worker worker = (repository.findById(Long.valueOf(id)).get());
                 workedHours = jdbc.getAllMonthTimes(worker, tableName);
-                MonthSalary salary = salaryCalculation(workedHours);
+                MonthSalary salary = salaryCalculation(workedHours, startDate, endDate);
                 result.add(salary);
             }
         }
@@ -521,12 +521,12 @@ public class ImplementWorkerService implements WorkerService {
         return jdbc.getAllMonthTimes(worker, tableName);
     }
 
-    public ArrayList<MonthSalary> getOneWorkersSalaryInMonth(String tableName, Long id) throws SQLException {
+    public ArrayList<MonthSalary> getOneWorkersSalaryInMonth(String tableName, Long id, int startDate, int endDate) throws SQLException  {
         ArrayList<MonthSalary> result = new ArrayList<>();
         if (repository.findById(Long.valueOf(id)).isPresent()) {
             Worker worker = (repository.findById(Long.valueOf(id)).get());
             workedHours = jdbc.getAllMonthTimes(worker, tableName);
-            MonthSalary salary = salaryCalculation(workedHours);
+            MonthSalary salary = salaryCalculation(workedHours, startDate, endDate);
             result.add(salary);
             }
         return result;

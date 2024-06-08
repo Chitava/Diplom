@@ -76,7 +76,7 @@ public interface WorkerService {
      * @param hours Сотрудник с данными по посещениям за конкретный месяц
      * @return
      */
-    MonthSalary salaryCalculation (WorkedHours hours);
+    MonthSalary salaryCalculation (WorkedHours hours, int start, int end) throws SQLException;
 
 
     /**
@@ -84,7 +84,7 @@ public interface WorkerService {
      * @param tableName Расчетный месяц
      * @return
      */
-    ArrayList<MonthSalary> getAllWorkersSalaryInMonth(String tableName) throws SQLException;
+    ArrayList<MonthSalary> getAllWorkersSalaryInMonth(String tableName, int start, int end) throws SQLException;
 
 
     /**\
@@ -121,5 +121,5 @@ public interface WorkerService {
      */
     public WorkedHours getAllMonthTimes (Worker worker, String tableName) throws SQLException;
 
-    public ArrayList<MonthSalary> getOneWorkersSalaryInMonth(String tableName, Long id) throws SQLException;
+    public ArrayList<MonthSalary> getOneWorkersSalaryInMonth(String tableName, Long id, int start, int end) throws SQLException;
 }

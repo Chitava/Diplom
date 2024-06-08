@@ -24,8 +24,21 @@ public class WorkedHours {
         this.times.add(time);
     }
 
-    public List<LocalDateTime> getTimes(){
-        return this.times;
+    public List<LocalDateTime> getTimes(int startDate, int endDate)  {
+        List<LocalDateTime> result = new ArrayList<>();
+        for (int i = 0; i < startDate-1; i++) {
+            result.add(LocalDateTime.of(0,1,1,0,0));
+        }
+        for (int i = startDate-1; i < endDate; i++) {
+            result.add(times.get(i));
+        }
+        for (int i = endDate+1;i < times.size()+1; i++)  {
+            result.add(LocalDateTime.of(0,1,1,0,0));
+        }
+        System.out.println(times);
+        System.out.println(result);
+
+        return result;
     }
 
     public void setTimes(List<LocalDateTime> times) {
