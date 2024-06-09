@@ -3,17 +3,15 @@ package chitava.diplom.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class MonthTime {
+
     private double edittime0;
     private double edittime1;
     private double edittime2;
@@ -45,6 +43,9 @@ public class MonthTime {
     private double edittime28;
     private double edittime29;
     private double edittime30;
+
+
+
 
 
     public ArrayList<Double> getAll() {

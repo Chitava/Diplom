@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -58,10 +59,10 @@ public interface WorkerService {
 
     /**
      * Метод получения праздничных дней в году
-     * @param year расчетный год
+     *
      * @return сообщение о выполненой операции
      */
-    String getHollydays(String year);
+    String getHollydays(String date);
 
     /**
      * Метод добавление новых данных о посещении сотрудников

@@ -1,7 +1,5 @@
 package chitava.diplom.services.implServices;
-
 import chitava.diplom.models.*;
-
 import chitava.diplom.repositorys.WorkersRepository;
 import chitava.diplom.services.SendTo;
 import chitava.diplom.services.WorkerService;
@@ -10,24 +8,28 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Row;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.http.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static chitava.diplom.models.Hollydays.yearHolidays;
+import static chitava.diplom.models.Hollydays.yearHolidaysDates;
 import static org.apache.commons.math3.util.Precision.round;
 
 
@@ -50,6 +52,9 @@ public class ImplementWorkerService implements WorkerService {
 
     @Autowired
     private SendTo send;
+
+
+
 
 
     /**
@@ -171,35 +176,42 @@ public class ImplementWorkerService implements WorkerService {
 
     /**
      * Метод получения праздничных дней в году для которого расчитывается зп
-     *
-     * @param year расчетный год
-     *             Данные записываются в коллекцию
+
      */
     @Override
-    public String getHollydays(String year) {
-        ResponseEntity<Hollydays> responce;
-        try {
-            String URL = String.format("https://production-calendar.ru/get/ru/%s/json", year); //адрес общедоступного
-            //ресурса с расписанными календарными днями на год
-            RestTemplate template = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-            responce = template.exchange(URL,
-                    HttpMethod.GET, entity, Hollydays.class);
-        } catch (Exception e) {
-            return "Ошибка получения праздничных дней " + e.getMessage();
-        }
-        yearHolidays.clear();
-        Hollydays hollydays = responce.getBody();
-        for (Hollyday day : hollydays.getDays()) {
-            if (day.getType_text().equals("Государственный праздник")) {
-                String date = day.getDate();
-                yearHolidays.add(date);
+    public String getHollydays(String date)  {
+        String urlDate = date.replace("-", "");
+        int year = Integer.parseInt(date.substring(0, date.indexOf("-")));
+        int month  = Integer.parseInt(date.substring(date.indexOf("-")+1));
+        LocalDate localDate  = LocalDate.of(year, month, 1);
+        int lenth = Integer.parseInt(String.valueOf(localDate.lengthOfMonth()));
+        for  (int i = 0; i < lenth; i++) {
+            String url = String.format("https://isdayoff.ru/%s", urlDate);
+            String day = "";
+            if (i < 9) {
+                day = "0" + (i + 1);
+            } else day = String.valueOf(i + 1);
+            url = url + day;
+//            //ресурса с расписанными календарными днями на год
+            RestTemplate restTemplate = new RestTemplate();
+            String stringPosts = "";
+            try {
+                stringPosts = restTemplate.getForObject(url, String.class);
+            } catch (Exception e) {
+                return "0";
+            }
+            if (stringPosts.equals("1")) {
+                Hollydays.yearHolidaysDates.add(LocalDate.of(year, month, Integer.parseInt(day)));
+                Hollydays.monthTime.put(i+1, true);
+            }else {
+                Hollydays.monthTime.put(i+1, false);
             }
         }
+
         return null;
     }
+
+
 
     /**
      * Метод добавление новых данных о посещении сотрудников
@@ -211,6 +223,7 @@ public class ImplementWorkerService implements WorkerService {
     public String addReportCard(MultipartFile file) throws SQLException, ClassNotFoundException {
         jdbc.createTable(EstimatedDate.dateForDB);
         HSSFWorkbook hb;
+
         int count = 0;
         try (POIFSFileSystem pSystem = new POIFSFileSystem(file.getInputStream());) {
             hb = new HSSFWorkbook(pSystem);
@@ -326,12 +339,12 @@ public class ImplementWorkerService implements WorkerService {
         for (int i = 0; i < hour.size(); i++) {
             String day = String.valueOf(i + 1);
             String key = "";
-            if (i <= 8) {
+            if (i < 9) {
                 key = "0" + String.valueOf(i + 1);
             } else {
                 key = String.valueOf(i + 1);
             }
-            if (i < 10) {
+            if (i < 9) {
                 verificationDays = "0" + day + monthYears;
             } else {
                 verificationDays = day + monthYears;
@@ -339,12 +352,12 @@ public class ImplementWorkerService implements WorkerService {
             double dayTime = 0;
             String dayHour = String.valueOf(hour.get(i).getHour());
             String dayMinute = String.valueOf(hour.get(i).getMinute());
-            if (hour.get(i).getMinute() < 10) {
+            if (hour.get(i).getMinute() < 9) {
                 dayTime = Double.parseDouble(dayHour + ".0" + dayMinute);
             } else {
                 dayTime = Double.parseDouble(dayHour + "." + dayMinute);
             }
-            if (yearHolidays.contains(String.valueOf(verificationDays)) || String.valueOf(verificationData.getDayOfWeek()) ==
+            if (yearHolidaysDates.contains(String.valueOf(verificationDays)) || String.valueOf(verificationData.getDayOfWeek()) ==
                     "SATURDAY" || String.valueOf(verificationData.getDayOfWeek()) == "SUNDAY") {
                 times.put(key, Arrays.asList(dayTime, true));
             } else {
@@ -361,14 +374,18 @@ public class ImplementWorkerService implements WorkerService {
      * @param hours
      * @return
      */
+    //todo
+    //доделать сравнение с выходным
     public MonthSalary salaryCalculation(WorkedHours hours, int startDate, int endDate)  {
         String[] temp = new StringBuilder(EstimatedDate.dateForDB.replace("times_", ""))
                 .toString().split("_");
-        String monthYears = new StringBuilder(".").append(temp[1]).append(".").append(temp[0]).toString();
-        //получаем дату месяц.год
+//        String monthYears = new StringBuilder(".").append(temp[1]).append(".").append(temp[0]).toString();
+        String monthYears = new StringBuilder(temp[0]).append("-").append(temp[1]).append("-").toString();
+        int year = Integer.parseInt(temp[0]);
+        int month = Integer.parseInt(temp[1]); //получаем дату месяц.год
         Worker worker = hours.getWorker();
         List<LocalDateTime> hour = hours.getTimes(startDate, endDate);
-        String verificationDays = ""; //переменная для проверки выходной или нет сверяемся со списком полученных
+        LocalDate verificationDay; //переменная для проверки выходной или нет сверяемся со списком полученных
         // праздников
         LocalDateTime verificationData = LocalDateTime.of(Integer.parseInt(temp[0]),
                 Integer.parseInt(temp[1]), 1, 0, 0);
@@ -381,17 +398,17 @@ public class ImplementWorkerService implements WorkerService {
         double overSalary = 0;
         double fullSalary = 0;
         double paymentInSmallDayInHour = worker.getPaymentInDay() / 8;
-        for (int i = 0; i < hour.size(); i++) {
-            String day = String.valueOf(i + 1);
-            if (i < 10) {
-                verificationDays = "0" + day + monthYears;
-            } else {
-                verificationDays = day + monthYears;
-            }
+        for (int i = startDate-1; i < endDate; i++) {
+            int day = i + 1;
+            verificationDay = LocalDate.of(year, month, day);
+//            if (i < 9) {
+//                verificationDay = monthYears + "0" + day;
+//            } else {
+//                verificationDay = monthYears + day;//            }
             double dayTime = 0;
             String dayHour = String.valueOf(hour.get(i).getHour());
             String dayMinute = String.valueOf(hour.get(i).getMinute());
-            if (hour.get(i).getMinute() < 10) {
+            if (hour.get(i).getMinute() < 9) {
                 dayTime = Double.parseDouble(dayHour + ".0" + dayMinute);
             } else {
                 dayTime = Double.parseDouble(dayHour + "." + dayMinute);
@@ -401,16 +418,16 @@ public class ImplementWorkerService implements WorkerService {
                 // проверка руководитель или нет
                 if (worker.getPost()) {
                     //проверка или праздничный день или выходной
-                    if (yearHolidays.contains(String.valueOf(verificationDays)) || String.valueOf(verificationData.getDayOfWeek()) ==
-                            "SATURDAY" || String.valueOf(verificationData.getDayOfWeek()) == "SUNDAY") {
+                    if (yearHolidaysDates.contains(verificationDay)){
                         if (dayTime <= 6) {
                             salary = salary + worker.getPeymentInHollydays();
+                            hollydaySalary = hollydaySalary + worker.getPeymentInHollydays();
                             hollydays++;
                         } else {
-                            salary = salary + worker.getPeymentInHollydays();
+                            salary = salary + worker.getPeymentInHollydays() + (dayTime - 6) * worker.getPaymentInHour();
                             overSalary = overSalary + (dayTime - 6) * worker.getPaymentInHour();
                             overTimes = overTimes + (dayTime - 6);
-                            hollydaySalary = hollydaySalary + (dayTime - 6) * worker.getPaymentInHour();;
+                            hollydaySalary = hollydaySalary + (dayTime - 6) * worker.getPaymentInHour() + worker.getPeymentInHollydays();
                             hollydayElaborTime = hollydayElaborTime + (dayTime - 6);
                             hollydays++;
                         }

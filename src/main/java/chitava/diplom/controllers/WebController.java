@@ -75,21 +75,14 @@ public class WebController {
         model.addAttribute("workers", workers);
         EstimatedDate.setDateForDB(date);
         EstimatedDate.setDateForHTML(date);
-        Hollydays.yearHolidays.clear();
-        try {
-            String year = EstimatedDate.dateForHTML.substring(EstimatedDate.dateForHTML.indexOf(" "));
-            String message = service.getHollydays(year);
-            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
-            if (message == null) {
-                model.addAttribute("message", "Дата расчета установлена " + EstimatedDate.dateForHTML);
-            } else {
-                model.addAttribute("message", message);
-            }
-            return "result";
-        } catch (StringIndexOutOfBoundsException e) {
-            model.addAttribute("message", "Ошибка выбора даты");
-            return "result";
-        }
+        Hollydays.yearHolidaysDates.clear();
+        Hollydays.monthTime.clear();
+        service.getHollydays(date);
+        model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+        model.addAttribute("workers", workers);
+        model.addAttribute("message", "Расчетная дата " + EstimatedDate.dateForHTML);
+        return "result";
+
     }
 
     /**
@@ -404,6 +397,7 @@ public class WebController {
             }
         }
         model.addAttribute("edittimes", edittimes);
+        model.addAttribute("holydays", Hollydays.monthTime);
         model.addAttribute("monthtimes", times);
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);

@@ -35,9 +35,6 @@ public class WorkedHours {
         for (int i = endDate+1;i < times.size()+1; i++)  {
             result.add(LocalDateTime.of(0,1,1,0,0));
         }
-        System.out.println(times);
-        System.out.println(result);
-
         return result;
     }
 

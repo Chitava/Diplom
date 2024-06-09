@@ -14,7 +14,7 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <td class="info__td" th:each="day : ${monthtimes}" th:text="${day.key}" th:style="${day.value[1]} ? 'background:#409647;' : 'background: #ffffff;'"></td>
+                        <td class="info__td" th:each="day : ${holydays}" th:text="${day.key}" th:style="${day.value} ? 'background:#409647;' : 'background: #ffffff;'"></td>
                     </tr>
                     </thead>
                     <tbody>
