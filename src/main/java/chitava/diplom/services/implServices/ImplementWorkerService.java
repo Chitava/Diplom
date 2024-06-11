@@ -1,4 +1,5 @@
 package chitava.diplom.services.implServices;
+
 import chitava.diplom.models.*;
 import chitava.diplom.repositorys.WorkersRepository;
 import chitava.diplom.services.SendTo;
@@ -44,7 +45,6 @@ import static org.apache.commons.math3.util.Precision.round;
 public class ImplementWorkerService implements WorkerService {
     @Value("${URL_SAVE}")
     private String URL_SAVE;
-
     private Worker worker;
     private WorkedHours workedHours;
     @Autowired
@@ -52,9 +52,6 @@ public class ImplementWorkerService implements WorkerService {
 
     @Autowired
     private SendTo send;
-
-
-
 
 
     /**
@@ -176,16 +173,15 @@ public class ImplementWorkerService implements WorkerService {
 
     /**
      * Метод получения праздничных дней в году для которого расчитывается зп
-
      */
     @Override
-    public String getHollydays(String date)  {
+    public String getHollydays(String date) {
         String urlDate = date.replace("-", "");
         int year = Integer.parseInt(date.substring(0, date.indexOf("-")));
-        int month  = Integer.parseInt(date.substring(date.indexOf("-")+1));
-        LocalDate localDate  = LocalDate.of(year, month, 1);
+        int month = Integer.parseInt(date.substring(date.indexOf("-") + 1));
+        LocalDate localDate = LocalDate.of(year, month, 1);
         int lenth = Integer.parseInt(String.valueOf(localDate.lengthOfMonth()));
-        for  (int i = 0; i < lenth; i++) {
+        for (int i = 0; i < lenth; i++) {
             String url = String.format("https://isdayoff.ru/%s", urlDate);
             String day = "";
             if (i < 9) {
@@ -202,15 +198,14 @@ public class ImplementWorkerService implements WorkerService {
             }
             if (stringPosts.equals("1")) {
                 Hollydays.yearHolidaysDates.add(LocalDate.of(year, month, Integer.parseInt(day)));
-                Hollydays.monthTime.put(i+1, true);
-            }else {
-                Hollydays.monthTime.put(i+1, false);
+                Hollydays.monthTime.put(i + 1, true);
+            } else {
+                Hollydays.monthTime.put(i + 1, false);
             }
         }
 
         return null;
     }
-
 
 
     /**
@@ -221,6 +216,7 @@ public class ImplementWorkerService implements WorkerService {
      * @throws IOException
      */
     public String addReportCard(MultipartFile file) throws SQLException, ClassNotFoundException {
+        jdbc.deleteTable(EstimatedDate.dateForDB);
         jdbc.createTable(EstimatedDate.dateForDB);
         HSSFWorkbook hb;
 
@@ -376,7 +372,7 @@ public class ImplementWorkerService implements WorkerService {
      */
     //todo
     //доделать сравнение с выходным
-    public MonthSalary salaryCalculation(WorkedHours hours, int startDate, int endDate)  {
+    public MonthSalary salaryCalculation(WorkedHours hours, int startDate, int endDate) {
         String[] temp = new StringBuilder(EstimatedDate.dateForDB.replace("times_", ""))
                 .toString().split("_");
 //        String monthYears = new StringBuilder(".").append(temp[1]).append(".").append(temp[0]).toString();
@@ -385,87 +381,92 @@ public class ImplementWorkerService implements WorkerService {
         int month = Integer.parseInt(temp[1]); //получаем дату месяц.год
         Worker worker = hours.getWorker();
         List<LocalDateTime> hour = hours.getTimes(startDate, endDate);
-        LocalDate verificationDay; //переменная для проверки выходной или нет сверяемся со списком полученных
-        // праздников
-        LocalDateTime verificationData = LocalDateTime.of(Integer.parseInt(temp[0]),
-                Integer.parseInt(temp[1]), 1, 0, 0);
-        int workDays = 0;
-        double overTimes = 0;
-        double hollydayElaborTime = 0;
-        double hollydaySalary = 0;
-        int hollydays = 0;
-        double salary = 0;
-        double overSalary = 0;
-        double fullSalary = 0;
-        double paymentInSmallDayInHour = worker.getPaymentInDay() / 8;
-        for (int i = startDate-1; i < endDate; i++) {
-            int day = i + 1;
-            verificationDay = LocalDate.of(year, month, day);
+        if (hour.size() > 0) {
+            LocalDate verificationDay; //переменная для проверки выходной или нет сверяемся со списком полученных
+            // праздников
+            LocalDateTime verificationData = LocalDateTime.of(Integer.parseInt(temp[0]),
+                    Integer.parseInt(temp[1]), 1, 0, 0);
+            int workDays = 0;
+            double overTimes = 0;
+            double hollydayElaborTime = 0;
+            double hollydaySalary = 0;
+            int hollydays = 0;
+            double salary = 0;
+            double overSalary = 0;
+            double fullSalary = 0;
+            double paymentInSmallDayInHour = worker.getPaymentInDay() / 8;
+            for (int i = startDate - 1; i < endDate; i++) {
+                int day = i + 1;
+                verificationDay = LocalDate.of(year, month, day);
 //            if (i < 9) {
 //                verificationDay = monthYears + "0" + day;
 //            } else {
 //                verificationDay = monthYears + day;//            }
-            double dayTime = 0;
-            String dayHour = String.valueOf(hour.get(i).getHour());
-            String dayMinute = String.valueOf(hour.get(i).getMinute());
-            if (hour.get(i).getMinute() < 9) {
-                dayTime = Double.parseDouble(dayHour + ".0" + dayMinute);
-            } else {
-                dayTime = Double.parseDouble(dayHour + "." + dayMinute);
-            }
-            if (dayTime > 1) {
-                workDays++;
-                // проверка руководитель или нет
-                if (worker.getPost()) {
-                    //проверка или праздничный день или выходной
-                    if (yearHolidaysDates.contains(verificationDay)){
-                        if (dayTime <= 6) {
-                            salary = salary + worker.getPeymentInHollydays();
-                            hollydaySalary = hollydaySalary + worker.getPeymentInHollydays();
-                            hollydays++;
+                double dayTime = 0;
+                String dayHour = String.valueOf(hour.get(i).getHour());
+                String dayMinute = String.valueOf(hour.get(i).getMinute());
+                if (hour.get(i).getMinute() < 9) {
+                    dayTime = Double.parseDouble(dayHour + ".0" + dayMinute);
+                } else {
+                    dayTime = Double.parseDouble(dayHour + "." + dayMinute);
+                }
+                if (dayTime > 1) {
+                    workDays++;
+                    // проверка руководитель или нет
+                    if (worker.getPost()) {
+                        //проверка или праздничный день или выходной
+                        if (yearHolidaysDates.contains(verificationDay)) {
+                            if (dayTime <= 6) {
+                                salary = salary + worker.getPeymentInHollydays();
+                                hollydaySalary = hollydaySalary + worker.getPeymentInHollydays();
+                                hollydays++;
+                            } else {
+                                salary = salary + worker.getPeymentInHollydays() + (dayTime - 6) * worker.getPaymentInHour();
+                                overSalary = overSalary + (dayTime - 6) * worker.getPaymentInHour();
+                                overTimes = overTimes + (dayTime - 6);
+                                hollydaySalary = hollydaySalary + (dayTime - 6) * worker.getPaymentInHour() + worker.getPeymentInHollydays();
+                                hollydayElaborTime = hollydayElaborTime + (dayTime - 6);
+                                hollydays++;
+                            }
                         } else {
-                            salary = salary + worker.getPeymentInHollydays() + (dayTime - 6) * worker.getPaymentInHour();
-                            overSalary = overSalary + (dayTime - 6) * worker.getPaymentInHour();
-                            overTimes = overTimes + (dayTime - 6);
-                            hollydaySalary = hollydaySalary + (dayTime - 6) * worker.getPaymentInHour() + worker.getPeymentInHollydays();
-                            hollydayElaborTime = hollydayElaborTime + (dayTime - 6);
-                            hollydays++;
+                            //если отработано менее 9 часов
+                            if (dayTime < 9) {
+                                salary = salary + (dayTime - 1) * paymentInSmallDayInHour;
+                            }
+                            //если переработка
+                            else if (dayTime > 9.20) {
+                                salary = salary + worker.getPaymentInDay();
+                                overSalary = overSalary + (dayTime - 9) * worker.getPaymentInHour();
+                                overTimes = overTimes + (dayTime - 9);
+                            }
+                            //если ровно 9 часов
+                            else {
+                                salary = salary + worker.getPaymentInDay();
+                            }
                         }
                     } else {
-                        //если отработано менее 9 часов
                         if (dayTime < 9) {
                             salary = salary + (dayTime - 1) * paymentInSmallDayInHour;
-                        }
-                        //если переработка
-                        else if (dayTime > 9.20) {
+                        } else if (dayTime > 9.20) {
                             salary = salary + worker.getPaymentInDay();
                             overSalary = overSalary + (dayTime - 9) * worker.getPaymentInHour();
                             overTimes = overTimes + (dayTime - 9);
-                        }
-                        //если ровно 9 часов
-                        else {
+                        } else {
                             salary = salary + worker.getPaymentInDay();
                         }
                     }
-                } else {
-                    if (dayTime < 9) {
-                        salary = salary + (dayTime - 1) * paymentInSmallDayInHour;
-                    } else if (dayTime > 9.20) {
-                        salary = salary + worker.getPaymentInDay();
-                        overSalary = overSalary + (dayTime - 9) * worker.getPaymentInHour();
-                        overTimes = overTimes + (dayTime - 9);
-                    } else {
-                        salary = salary + worker.getPaymentInDay();
-                    }
                 }
+                verificationData = verificationData.plusDays(1);
+                fullSalary = salary + overSalary;
             }
-            verificationData = verificationData.plusDays(1);
-            fullSalary = salary + overSalary;
+            MonthSalary monthSalary = new MonthSalary(worker.getId(), worker.getName(), workDays, hollydays,
+                    round(overTimes, 2), round(salary, 2), round(overSalary, 2),
+                    round(hollydayElaborTime, 2), round(hollydaySalary, 2), round(fullSalary, 2));
+            return monthSalary;
         }
-        MonthSalary monthSalary = new MonthSalary(worker.getId(), worker.getName(), workDays, hollydays,
-                round(overTimes, 2), round(salary, 2), round(overSalary, 2),
-                round(hollydayElaborTime, 2), round(hollydaySalary, 2), round(fullSalary, 2));
-        return monthSalary;
+        return new MonthSalary(worker.getId(), worker.getName(), 0, 0,
+                0, 0, 0,
+                0, 0, 0);
     }
 
     /**
@@ -475,7 +476,7 @@ public class ImplementWorkerService implements WorkerService {
      * @return
      * @throws SQLException
      */
-    public ArrayList<MonthSalary> getAllWorkersSalaryInMonth(String tableName, int startDate, int endDate) throws SQLException  {
+    public ArrayList<MonthSalary> getAllWorkersSalaryInMonth(String tableName, int startDate, int endDate) throws SQLException {
         List<String> allWorkersId = repository.findAllIdWorker();
         ArrayList<MonthSalary> result = new ArrayList<>();
         for (String id : allWorkersId) {
@@ -538,14 +539,14 @@ public class ImplementWorkerService implements WorkerService {
         return jdbc.getAllMonthTimes(worker, tableName);
     }
 
-    public ArrayList<MonthSalary> getOneWorkersSalaryInMonth(String tableName, Long id, int startDate, int endDate) throws SQLException  {
+    public ArrayList<MonthSalary> getOneWorkersSalaryInMonth(String tableName, Long id, int startDate, int endDate) throws SQLException {
         ArrayList<MonthSalary> result = new ArrayList<>();
         if (repository.findById(Long.valueOf(id)).isPresent()) {
             Worker worker = (repository.findById(Long.valueOf(id)).get());
             workedHours = jdbc.getAllMonthTimes(worker, tableName);
             MonthSalary salary = salaryCalculation(workedHours, startDate, endDate);
             result.add(salary);
-            }
+        }
         return result;
     }
 }

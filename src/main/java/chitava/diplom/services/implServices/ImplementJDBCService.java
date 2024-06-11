@@ -43,6 +43,17 @@ public class ImplementJDBCService implements JDBCService {
     }
 
     /**
+     * Метод удаления таблицы
+     */
+
+    public void deleteTable(String tableName) throws SQLException, ClassNotFoundException {
+        Connection connect = connection.getConnection();
+        String query = "DROP TABLE IF EXISTS " + tableName + ";";
+        Statement statement = connect.createStatement();
+        statement.execute(query);
+        connect.close();
+    }
+    /**
      * Метод добавления идентификатора сотрудника в таблицу с данными посещения
      * @param tableName
      * @param workerid
