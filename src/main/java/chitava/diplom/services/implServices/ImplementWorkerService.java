@@ -380,7 +380,13 @@ public class ImplementWorkerService implements WorkerService {
         int year = Integer.parseInt(temp[0]);
         int month = Integer.parseInt(temp[1]); //получаем дату месяц.год
         Worker worker = hours.getWorker();
-        List<LocalDateTime> hour = hours.getTimes(startDate, endDate);
+        List<LocalDateTime> hour= new ArrayList<>();
+        try {
+            hour = hours.getTimes(startDate, endDate);
+        }catch (Exception e)  {
+            e.printStackTrace();
+        }
+
         if (hour.size() > 0) {
             LocalDate verificationDay; //переменная для проверки выходной или нет сверяемся со списком полученных
             // праздников
@@ -395,6 +401,9 @@ public class ImplementWorkerService implements WorkerService {
             double overSalary = 0;
             double fullSalary = 0;
             double paymentInSmallDayInHour = worker.getPaymentInDay() / 8;
+            if (endDate > hour.size())   {
+                endDate = hour.size();
+            }
             for (int i = startDate - 1; i < endDate; i++) {
                 int day = i + 1;
                 verificationDay = LocalDate.of(year, month, day);

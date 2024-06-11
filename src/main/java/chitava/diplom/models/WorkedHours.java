@@ -28,6 +28,9 @@ public class WorkedHours {
 
     public List<LocalDateTime> getTimes(int startDate, int endDate) {
         List<LocalDateTime> result = new ArrayList<>();
+        if  (endDate > times.size())  {
+            endDate = times.size();
+        }
         if (times.size() > 0) {
             for (int i = 0; i < startDate - 1; i++) {
                 result.add(LocalDateTime.of(0, 1, 1, 0, 0));
