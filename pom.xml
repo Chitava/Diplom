@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>chitava</groupId>
 	<artifactId>inbulkar</artifactId>
-<!--	<version>1.0.10</version>-->
+	<version>1.0.50</version>
 	<name>inbulkAr</name>
 	<description>Дипломная работа GeekBrains</description>
 	<properties>
