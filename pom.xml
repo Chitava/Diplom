@@ -9,8 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>chitava</groupId>
-	<artifactId>diplom</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>inbulkar</artifactId>
+<!--	<version>1.0.10</version>-->
 	<name>inbulkAr</name>
 	<description>Дипломная работа GeekBrains</description>
 	<properties>

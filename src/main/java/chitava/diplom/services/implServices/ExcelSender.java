@@ -99,7 +99,7 @@ public class ExcelSender implements SendTo {
 
                 colIndex++;
                 cell = row.createCell(colIndex);
-                cell.setCellFormula("H" + rowIndex + "-" + "I" + rowIndex);
+                cell.setCellFormula("J" + rowIndex + "-" + "K" + rowIndex);
 
                 book.write(new FileOutputStream(file));
                 book.write(stream);
