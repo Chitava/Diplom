@@ -477,7 +477,7 @@ public class ImplementWorkerService implements WorkerService {
             if (overTimes.getDayOfMonth() ==1){
                 finalOverTimesToString = overTimes.getHour() + "." + overTimes.getMinute();
             }else {
-                int hoerOverTimes  = overTimes.getDayOfMonth()*24 + overTimes.getHour();
+                int hoerOverTimes  = overTimes.getDayOfMonth()*24 + overTimes.getHour()-24;
                 finalOverTimesToString  =  hoerOverTimes  +  "."  + overTimes.getMinute();
             }
             double hourOverTimes  = Double.parseDouble(finalOverTimesToString);
