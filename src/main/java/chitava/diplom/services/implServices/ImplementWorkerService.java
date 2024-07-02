@@ -394,7 +394,6 @@ public class ImplementWorkerService implements WorkerService {
                     Integer.parseInt(temp[1]), 1, 0, 0);
             int workDays = 0;
             LocalDateTime overTimes  = LocalDateTime.of(0,   1, 1, 0, 0);
-//            double overTimes = 0;
             double hollydayElaborTime = 0;
             double hollydaySalary = 0;
             int hollydays = 0;
@@ -408,10 +407,6 @@ public class ImplementWorkerService implements WorkerService {
             for (int i = startDate - 1; i < endDate; i++) {
                 int day = i + 1;
                 verificationDay = LocalDate.of(year, month, day);
-//            if (i < 9) {
-//                verificationDay = monthYears + "0" + day;
-//            } else {
-//                verificationDay = monthYears + day;//            }
                 double dayTime = 0;
                 String dayHour = String.valueOf(hour.get(i).getHour());
                 String dayMinute = String.valueOf(hour.get(i).getMinute());
@@ -434,7 +429,6 @@ public class ImplementWorkerService implements WorkerService {
                                 salary = salary + worker.getPeymentInHollydays() + (dayTime - 6) * worker.getPaymentInHour();
                                 overSalary = overSalary + (dayTime - 6) * worker.getPaymentInHour();
                                 overTimes = overTimes.plusHours(hour.get(i).getHour()-6).plusMinutes(hour.get(i).getMinute());
-//                                overTimes = overTimes + (dayTime - 6);
                                 hollydaySalary = hollydaySalary + (dayTime - 6) * worker.getPaymentInHour() + worker.getPeymentInHollydays();
                                 hollydayElaborTime = hollydayElaborTime + (dayTime - 6);
                                 hollydays++;
@@ -445,7 +439,7 @@ public class ImplementWorkerService implements WorkerService {
                                 salary = salary + (dayTime - 1) * paymentInSmallDayInHour;
                             }
                             //если переработка
-                            else if (dayTime > 9.20) {
+                            else if (dayTime >= 9) {
                                 salary = salary + worker.getPaymentInDay();
                                 overSalary = overSalary + (dayTime - 9) * worker.getPaymentInHour();
                                 overTimes = overTimes.plusHours(hour.get(i).getHour()-9).plusMinutes(hour.get(i).getMinute());
@@ -459,11 +453,10 @@ public class ImplementWorkerService implements WorkerService {
                     } else {
                         if (dayTime < 9) {
                             salary = salary + (dayTime - 1) * paymentInSmallDayInHour;
-                        } else if (dayTime > 9.20) {
+                        } else if (dayTime >= 9) {
                             salary = salary + worker.getPaymentInDay();
                             overSalary = overSalary + (dayTime - 9) * worker.getPaymentInHour();
                             overTimes = overTimes.plusHours(hour.get(i).getHour()-9).plusMinutes(hour.get(i).getMinute());
-//                            overTimes = overTimes + (dayTime - 9);
                         } else {
                             salary = salary + worker.getPaymentInDay();
                         }
@@ -483,7 +476,7 @@ public class ImplementWorkerService implements WorkerService {
             double hourOverTimes  = Double.parseDouble(finalOverTimesToString);
 
             MonthSalary monthSalary = new MonthSalary(worker.getId(), worker.getName(), workDays, hollydays,
-                    round(hourOverTimes, 2), round(salary, 2), round(overSalary, 2),
+                    round(hourOverTimes, 2), round(salary, 2), round(hourOverTimes*worker.getPaymentInHour(), 2),
                     round(hollydayElaborTime, 2), round(hollydaySalary, 2), round(fullSalary, 2));
             return monthSalary;
         }
