@@ -426,7 +426,7 @@ public class ImplementWorkerService implements WorkerService {
                                 hollydaySalary = hollydaySalary + worker.getPeymentInHollydays();
                                 hollydays++;
                             } else {
-                                salary = salary + worker.getPeymentInHollydays() + (dayTime - 6) * worker.getPaymentInHour();
+                                salary = salary + worker.getPeymentInHollydays();
                                 overSalary = overSalary + (dayTime - 6) * worker.getPaymentInHour();
                                 overTimes = overTimes.plusHours(hour.get(i).getHour()-6).plusMinutes(hour.get(i).getMinute());
                                 hollydaySalary = hollydaySalary + (dayTime - 6) * worker.getPaymentInHour() + worker.getPeymentInHollydays();
@@ -463,7 +463,7 @@ public class ImplementWorkerService implements WorkerService {
                     }
                 }
                 verificationData = verificationData.plusDays(1);
-                fullSalary = salary + overSalary;
+
             }
             String finalOverTimesToString= "";
 
@@ -474,7 +474,7 @@ public class ImplementWorkerService implements WorkerService {
                 finalOverTimesToString  =  hoerOverTimes  +  "."  + overTimes.getMinute();
             }
             double hourOverTimes  = Double.parseDouble(finalOverTimesToString);
-
+            fullSalary = salary + hourOverTimes*worker.getPaymentInHour();
             MonthSalary monthSalary = new MonthSalary(worker.getId(), worker.getName(), workDays, hollydays,
                     round(hourOverTimes, 2), round(salary, 2), round(hourOverTimes*worker.getPaymentInHour(), 2),
                     round(hollydayElaborTime, 2), round(hollydaySalary, 2), round(fullSalary, 2));
