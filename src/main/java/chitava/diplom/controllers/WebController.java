@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 
+import static chitava.diplom.models.Hollydays.yearHolidaysDates;
+
 /**
  * Класс обработчик HTTP запросов работы с записями сотрудников
  */
@@ -78,9 +80,14 @@ public class WebController {
         Hollydays.yearHolidaysDates.clear();
         Hollydays.monthTime.clear();
         service.getHollydays(date);
+        if (yearHolidaysDates.size() == 0){
+            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+            model.addAttribute("workers", workers);
+            model.addAttribute("message", "Не удалось получить производственный календарь");
+        }else {
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
-        model.addAttribute("message", "Расчетная дата " + EstimatedDate.dateForHTML);
+        model.addAttribute("message", "Расчетная дата " + EstimatedDate.dateForHTML);}
         return "result";
 
     }

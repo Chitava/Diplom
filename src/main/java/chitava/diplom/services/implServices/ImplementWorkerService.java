@@ -429,7 +429,7 @@ public class ImplementWorkerService implements WorkerService {
                                 salary = salary + worker.getPeymentInHollydays();
                                 overSalary = overSalary + (dayTime - 6) * worker.getPaymentInHour();
                                 overTimes = overTimes.plusHours(hour.get(i).getHour()-6).plusMinutes(hour.get(i).getMinute());
-                                hollydaySalary = hollydaySalary + (dayTime - 6) * worker.getPaymentInHour() + worker.getPeymentInHollydays();
+                                hollydaySalary = hollydaySalary + (dayTime - 6) * worker.getPaymentInHour();
                                 hollydayElaborTime = hollydayElaborTime + (dayTime - 6);
                                 hollydays++;
                             }
