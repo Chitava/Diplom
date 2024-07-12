@@ -12,6 +12,12 @@
           <option value="">Выбирете сотрудника</option>
           <option th:each="w: ${workers}" th:value="${w.id}" th:text="${w.name}"></option>
         </select>
+        <h3 style="margin-top: 20px">Выберите диапазон дат</h3>
+        <form class="estimated_form" th:action="@{/inbulk/calcall}"  method="post">
+          <h3 >Начальная дата</h3>
+          <input class="date" type="number" name="startDate" min="1" max="31">
+          <h3>Конечная дата</h3>
+          <input class="date" type="number" name="endDate" min="1" max="31">
         <button th:class="button">Расчитать сотрудника</button>
       </form>
     </section>
