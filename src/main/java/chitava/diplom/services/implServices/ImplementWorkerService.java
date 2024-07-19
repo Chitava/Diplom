@@ -394,7 +394,7 @@ public class ImplementWorkerService implements WorkerService {
                     Integer.parseInt(temp[1]), 1, 0, 0);
             int workDays = 0;
             LocalDateTime overTimes  = LocalDateTime.of(0,   1, 1, 0, 0);
-            double hollydayElaborTime = 0;
+            LocalDateTime hollydayElaborTime = LocalDateTime.of(0,   1, 1, 0, 0);
             double hollydaySalary = 0;
             int hollydays = 0;
             double salary = 0;
@@ -429,8 +429,11 @@ public class ImplementWorkerService implements WorkerService {
                                 salary = salary + worker.getPeymentInHollydays();
                                 overSalary = overSalary + (dayTime - 6) * worker.getPaymentInHour();
                                 overTimes = overTimes.plusHours(hour.get(i).getHour()-6).plusMinutes(hour.get(i).getMinute());
-                                hollydaySalary = hollydaySalary + (dayTime - 6) * worker.getPaymentInHour();
-                                hollydayElaborTime = hollydayElaborTime + (dayTime - 6);
+                                hollydaySalary = hollydaySalary + worker.getPeymentInHollydays();;
+                                String tempHollydayElaborTime = String.valueOf((dayTime - 6));
+                                int tempHour = Integer.parseInt(tempHollydayElaborTime.substring(0, tempHollydayElaborTime.indexOf(".")));
+                                int tempMinute = Integer.parseInt(tempHollydayElaborTime.substring(tempHollydayElaborTime.indexOf(".")+1,tempHollydayElaborTime.indexOf(".")+3));
+                                hollydayElaborTime = hollydayElaborTime.plusHours(tempHour).plusMinutes(tempMinute);
                                 hollydays++;
                             }
                         } else {
@@ -475,14 +478,18 @@ public class ImplementWorkerService implements WorkerService {
             }
             double hourOverTimes  = Double.parseDouble(finalOverTimesToString);
             fullSalary = salary + hourOverTimes*worker.getPaymentInHour();
+            String tempHollydayElaborHours = String.valueOf((hollydayElaborTime.getDayOfMonth()-1)*24 + hollydayElaborTime.getHour());
+            String tempHollydayElaborMinute = String.valueOf(hollydayElaborTime.getMinute());
+            Double tempHollydayElaborTimes = Double.parseDouble(tempHollydayElaborHours + "." + tempHollydayElaborMinute);
             MonthSalary monthSalary = new MonthSalary(worker.getId(), worker.getName(), workDays, hollydays,
                     round(hourOverTimes, 2), round(salary, 2), round(hourOverTimes*worker.getPaymentInHour(), 2),
-                    round(hollydayElaborTime, 2), round(hollydaySalary, 2), round(fullSalary, 2));
+                    tempHollydayElaborTimes, round(hollydaySalary, 2), round(tempHollydayElaborTimes*worker.getPaymentInHour(), 2), round(fullSalary, 2));
+            System.out.println(monthSalary);
             return monthSalary;
         }
         return new MonthSalary(worker.getId(), worker.getName(), 0, 0,
                 0, 0, 0,
-                0, 0, 0);
+                0, 0, 0,0);
     }
 
     /**

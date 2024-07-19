@@ -87,7 +87,7 @@ public class ExcelSender implements SendTo {
 
                 colIndex++;
                 cell = row.createCell(colIndex);
-                cell.setCellValue(salary.getHollydaySalary());//Зарплата за переработку в выходные
+                cell.setCellValue(salary.getHollydayOverSalary());//Зарплата за переработку в выходные
 
                 colIndex++;
                 cell = row.createCell(colIndex);

@@ -19,11 +19,12 @@ public class MonthSalary {
     private double prepayment;
     private double hollydayElaborTime;
     private double hollydaySalary;
+    private double hollydayOverSalary;
     private double fullSalary;
 
 
     public MonthSalary(Long workerId, String workerName, int workDays, int hollydays, double overTimes, double salary,
-                       double overSalary, double hollydayElaborTime, double hollydaySalary, double fullSalary) {
+                       double overSalary, double hollydayElaborTime, double hollydaySalary, double hollydayOverSalary,double fullSalary) {
         this.workerId = workerId;
         this.workerName = workerName;
         this.workDays = workDays;
@@ -33,6 +34,7 @@ public class MonthSalary {
         this.overSalary = overSalary;
         this.hollydayElaborTime = hollydayElaborTime;
         this.hollydaySalary = hollydaySalary;
+        this.hollydayOverSalary = hollydayOverSalary;
         this.fullSalary = fullSalary;
     }
 }
