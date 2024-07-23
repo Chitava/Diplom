@@ -42,7 +42,7 @@ public class ExcelSender implements SendTo {
         Files.createDirectories(Paths.get(URL_SAVE));
         File file = new File("Зарплата за " + EstimatedDate.dateForHTML + ".xls");
         String[] nameCol = {"№", "ФИО", "Отработано дней", "Выходные и праздники", "Часов переработки", "Зарплата за дни",
-                "Зарплата за переработку", "Время переработки в выходные", "Зарплата за переработку в выходные","Зарплата за месяц", "Аванс", "Итого на руки"};
+                "Зарплата за переработку", "Время переработки в выходные", "Зарплата за переработку в выходные", "Зарплата за переработку в выходные", "Зарплата за месяц", "Аванс", "Итого на руки"};
         try (FileOutputStream stream = new FileOutputStream(file)) {
             Workbook book = new HSSFWorkbook();
             Sheet sheet = book.createSheet("Зарплата за +" + EstimatedDate.dateForHTML);
@@ -83,6 +83,10 @@ public class ExcelSender implements SendTo {
 
                 colIndex++;
                 cell = row.createCell(colIndex);
+                cell.setCellValue(salary.getHollydaySalary());//Зарплата за выходной
+
+                colIndex++;
+                cell = row.createCell(colIndex);
                 cell.setCellValue(salary.getHollydayElaborTime());//Время переработки в выходные
 
                 colIndex++;
@@ -99,7 +103,7 @@ public class ExcelSender implements SendTo {
 
                 colIndex++;
                 cell = row.createCell(colIndex);
-                cell.setCellFormula("J" + rowIndex + "-" + "K" + rowIndex);
+                cell.setCellFormula("K" + rowIndex + "-" + "L" + rowIndex);
 
                 book.write(new FileOutputStream(file));
                 book.write(stream);

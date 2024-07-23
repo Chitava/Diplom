@@ -20,6 +20,7 @@
             <th>Время переработки в выходные</th>
             <th>Зарплата за полные дни</th>
             <th>Зарплата за переработку</th>
+            <th>Зарплата за выходные</th>
             <th>Зарплата за переработку в выходные</th>
             <th>Аванс</th>
             <th>Итого за месяц</th>
@@ -50,6 +51,7 @@
                   <td th:text="${a.hollydayElaborTime}"></td>
                   <td th:text="${a.salary}"><span> p.</span></td>
                   <td th:text="${a.overSalary}"><span> р.</span></td>
+                  <td th:text="${a.hollydaySalary}"><span> р.</span></td>
                   <td th:text="${a.hollydayOverSalary}"><span> р.</span></td>
                   <td>
                       <input th:sase="null" class="recalculation" type="number" min="0" name="prepayment"
