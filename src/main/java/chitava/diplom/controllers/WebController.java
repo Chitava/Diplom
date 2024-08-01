@@ -330,6 +330,7 @@ public class WebController {
             fullPayment = fullPayment + salary.getFullSalary();
         }
         getAllWorkers();
+        System.out.println(EstimatedDate.dateForHTML);
         model.addAttribute("allsalary", monthSalaries);
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);

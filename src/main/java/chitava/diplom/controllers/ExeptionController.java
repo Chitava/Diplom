@@ -37,7 +37,7 @@ public class ExeptionController {
         Collection<Worker> workers = service.getAllWorkers();
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
-        model.addAttribute("message", "Не выбрана расчетная дата");
+        model.addAttribute("message", "Ошибка в данных");
         return "result";
     }
 

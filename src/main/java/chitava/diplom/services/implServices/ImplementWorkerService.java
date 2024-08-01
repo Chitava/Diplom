@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -370,8 +371,7 @@ public class ImplementWorkerService implements WorkerService {
      * @param hours
      * @return
      */
-    //todo
-    //доделать сравнение с выходным
+
     public MonthSalary salaryCalculation(WorkedHours hours, int startDate, int endDate) {
         String[] temp = new StringBuilder(EstimatedDate.dateForDB.replace("times_", ""))
                 .toString().split("_");
@@ -410,6 +410,9 @@ public class ImplementWorkerService implements WorkerService {
                 double dayTime = 0;
                 String dayHour = String.valueOf(hour.get(i).getHour());
                 String dayMinute = String.valueOf(hour.get(i).getMinute());
+                if (dayMinute.length() < 2) {
+                    dayMinute = dayMinute + "0";
+                }
                 if (hour.get(i).getMinute() < 9) {
                     dayTime = Double.parseDouble(dayHour + ".0" + dayMinute);
                 } else {
@@ -429,10 +432,11 @@ public class ImplementWorkerService implements WorkerService {
                                 salary = salary + worker.getPeymentInHollydays();
                                 overSalary = overSalary + (dayTime - 6) * worker.getPaymentInHour();
                                 overTimes = overTimes.plusHours(hour.get(i).getHour()-6).plusMinutes(hour.get(i).getMinute());
-                                hollydaySalary = hollydaySalary + worker.getPeymentInHollydays();;
-                                String tempHollydayElaborTime = String.valueOf((dayTime - 6));
+                                hollydaySalary = hollydaySalary + worker.getPeymentInHollydays();
+                                double tempDayTime = (double) Math.round((dayTime - 6) * 100)/100;
+                                String tempHollydayElaborTime = String.valueOf(tempDayTime);
                                 int tempHour = Integer.parseInt(tempHollydayElaborTime.substring(0, tempHollydayElaborTime.indexOf(".")));
-                                int tempMinute = Integer.parseInt(tempHollydayElaborTime.substring(tempHollydayElaborTime.indexOf(".")+1,tempHollydayElaborTime.indexOf(".")+3));
+                                int tempMinute = Integer.parseInt(tempHollydayElaborTime.substring(tempHollydayElaborTime.indexOf(".")+1));
                                 hollydayElaborTime = hollydayElaborTime.plusHours(tempHour).plusMinutes(tempMinute);
                                 hollydays++;
                             }
@@ -484,7 +488,6 @@ public class ImplementWorkerService implements WorkerService {
             MonthSalary monthSalary = new MonthSalary(worker.getId(), worker.getName(), workDays, hollydays,
                     round(hourOverTimes, 2), round(salary, 2), round(hourOverTimes*worker.getPaymentInHour(), 2),
                     tempHollydayElaborTimes, round(hollydaySalary, 2), round(tempHollydayElaborTimes*worker.getPaymentInHour(), 2), round(fullSalary, 2));
-            System.out.println(monthSalary);
             return monthSalary;
         }
         return new MonthSalary(worker.getId(), worker.getName(), 0, 0,
@@ -507,7 +510,9 @@ public class ImplementWorkerService implements WorkerService {
                 Worker worker = (repository.findById(Long.valueOf(id)).get());
                 workedHours = jdbc.getAllMonthTimes(worker, tableName);
                 MonthSalary salary = salaryCalculation(workedHours, startDate, endDate);
+                System.out.println(salary);
                 result.add(salary);
+
             }
         }
         return result;
