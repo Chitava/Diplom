@@ -510,7 +510,6 @@ public class ImplementWorkerService implements WorkerService {
                 Worker worker = (repository.findById(Long.valueOf(id)).get());
                 workedHours = jdbc.getAllMonthTimes(worker, tableName);
                 MonthSalary salary = salaryCalculation(workedHours, startDate, endDate);
-                System.out.println(salary);
                 result.add(salary);
 
             }
