@@ -220,7 +220,6 @@ public class ImplementWorkerService implements WorkerService {
         jdbc.deleteTable(EstimatedDate.dateForDB);
         jdbc.createTable(EstimatedDate.dateForDB);
         HSSFWorkbook hb;
-
         int count = 0;
         try (POIFSFileSystem pSystem = new POIFSFileSystem(file.getInputStream());) {
             hb = new HSSFWorkbook(pSystem);
@@ -299,10 +298,15 @@ public class ImplementWorkerService implements WorkerService {
             workedHours.addTime(LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(),
                     LocalDateTime.now().getDayOfMonth(), 0, 0));
         } else {
-            int hour = Integer.parseInt(time[2].substring(0, time[2].indexOf(":")));
-            int minute = Integer.parseInt(time[2].substring(time[2].indexOf(":") + 1));
-            workedHours.addTime(LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(),
-                    LocalDateTime.now().getDayOfMonth(), hour, minute));
+            try {
+                int hour = Integer.parseInt(time[2].substring(0, time[2].indexOf(":")));
+                int minute = Integer.parseInt(time[2].substring(time[2].indexOf(":") + 1));
+                workedHours.addTime(LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(),
+                        LocalDateTime.now().getDayOfMonth(), hour, minute));
+            }catch (Exception e) {
+                workedHours.addTime(LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(),
+                        LocalDateTime.now().getDayOfMonth(), 0, 0));
+            }
         }
     }
 
