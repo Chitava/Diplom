@@ -4,16 +4,14 @@ import chitava.diplom.models.*;
 import chitava.diplom.services.WorkerService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-
-import static chitava.diplom.models.Hollydays.yearHolidaysDates;
 
 /**
  * Класс обработчик HTTP запросов работы с записями сотрудников
@@ -77,19 +75,18 @@ public class WebController {
         model.addAttribute("workers", workers);
         EstimatedDate.setDateForDB(date);
         EstimatedDate.setDateForHTML(date);
-        Hollydays.yearHolidaysDates.clear();
-        Hollydays.monthTime.clear();
-        service.getHollydays(date);
-        if (yearHolidaysDates.size() == 0){
-            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
-            model.addAttribute("workers", workers);
-            model.addAttribute("message", "Не удалось получить производственный календарь");
-        }else {
+//        Hollydays.yearHolidaysDates.clear();
+//        Hollydays.monthTime.clear();
+//        service.getHollydays(date);
+//        if (yearHolidaysDates.size() == 0){
+//            model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
+//            model.addAttribute("workers", workers);
+//            model.addAttribute("message", "Не удалось получить производственный календарь");
+//        }else {
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
-        model.addAttribute("message", "Расчетная дата " + EstimatedDate.dateForHTML);}
+        model.addAttribute("message", "Расчетная дата " + EstimatedDate.dateForHTML);
         return "result";
-
     }
 
     /**
@@ -280,7 +277,8 @@ public class WebController {
      * @return страница с результатами выполнения метода
      */
     @PostMapping("/upload")
-    public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException, SQLException, ClassNotFoundException {
+    public String uploadFile(@RequestParam MultipartFile file, Model model) throws IOException, SQLException,
+            ClassNotFoundException {
         getAllWorkers();
         if (EstimatedDate.dateForHTML == "не установлена") {
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
@@ -323,7 +321,7 @@ public class WebController {
 
     @PostMapping("/calcall")
     public String allWorkersSallary(@ModelAttribute("startDate") int startDate, @ModelAttribute("endDate") int endDate,
-                                    Model model) throws SQLException   {
+                                    Model model) throws SQLException {
         double fullPayment = 0;
         monthSalaries = service.getAllWorkersSalaryInMonth(EstimatedDate.dateForDB, startDate, endDate);
         for (MonthSalary salary : monthSalaries) {
@@ -339,6 +337,7 @@ public class WebController {
 
     /**
      * Обработка запроса на перерасчет зарплаты за месяц с учетом аванса
+     *
      * @param id
      * @param prepayment
      * @param model
@@ -369,6 +368,7 @@ public class WebController {
 
     /**
      * Метод обработки запроса на сохранение расчета зарплаты в файл
+     *
      * @param model
      * @return
      * @throws IOException
@@ -386,6 +386,7 @@ public class WebController {
 
     /**
      * Метод обработки запроса детальной информации посещения за месяц со страницы с расчетом всех сотрудников всех
+     *
      * @param id
      * @param model
      * @return
@@ -393,9 +394,20 @@ public class WebController {
      */
     @GetMapping("/info/{id}")
     public String getMonthInfo(@PathVariable("id") Long id, Model model) throws SQLException {
-        Map times = service.getMonthTimes(EstimatedDate.dateForDB, id);
+        Map<String, List> monthTimes = service.getMonthTimes(EstimatedDate.dateForDB, id);
         getAllWorkers();
-        MonthTime edittimes = new MonthTime();
+        Map<String, Double> dayTimes = new TreeMap<>();
+        Map<String, Boolean> holidays = new TreeMap<>();
+        monthTimes.forEach((day, data) -> {
+            try {
+                dayTimes.put(day, (Double) data.get(0));
+                holidays.put(day, (Boolean) data.get(1));
+            } catch (Exception e) {
+                dayTimes.put(day, -0.0);
+                holidays.put(day, (Boolean) data.get(1));
+            }
+        });
+
         for (Worker worker : workers) {
             if (id.equals(worker.getId())) {
                 model.addAttribute("name", worker.getName());
@@ -403,9 +415,10 @@ public class WebController {
                 break;
             }
         }
-        model.addAttribute("edittimes", edittimes);
-        model.addAttribute("holydays", Hollydays.monthTime);
-        model.addAttribute("monthtimes", times);
+
+        model.addAttribute("dayTimes", dayTimes);
+        model.addAttribute("holidays", holidays);
+        model.addAttribute("monthtimes", monthTimes);
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
         return "monthinfo";
@@ -417,16 +430,27 @@ public class WebController {
      *
      * @param id
      * @param times
-     * @param httpServletResponse
      * @throws SQLException
      */
     @PostMapping("/save/{id}")
-    protected String printRequest(@PathVariable("id") Long id, MonthTime times, HttpServletResponse httpServletResponse,
-                                  Model model) throws SQLException {
+    protected String printRequest(@PathVariable("id") Long id,
+                                @ModelAttribute("edittimes") MonthTime times,
+                                Model model) throws SQLException {
         service.updateTimes(times, id);
-        Map time = service.getMonthTimes(EstimatedDate.dateForDB, id);
+        Map<String, List> monthTimes = service.getMonthTimes(EstimatedDate.dateForDB, id);
         getAllWorkers();
-        MonthTime edittimes = new MonthTime();
+        Map<String, Double> dayTimes = new TreeMap<>();
+        Map<String, Boolean> holidays = new TreeMap<>();
+        monthTimes.forEach((day, data) -> {
+            try {
+                dayTimes.put(day, (Double) data.get(0));
+                holidays.put(day, (Boolean) data.get(1));
+            } catch (Exception e) {
+                dayTimes.put(day, -0.0);
+                holidays.put(day, (Boolean) data.get(1));
+            }
+        });
+
         for (Worker worker : workers) {
             if (id.equals(worker.getId())) {
                 model.addAttribute("name", worker.getName());
@@ -434,19 +458,19 @@ public class WebController {
                 break;
             }
         }
-        model.addAttribute("edittimes", edittimes);
-        model.addAttribute("monthtimes", time);
+
+        model.addAttribute("dayTimes", dayTimes);
+        model.addAttribute("holidays", holidays);
+        model.addAttribute("monthtimes", monthTimes);
         model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
         model.addAttribute("workers", workers);
-//        httpServletResponse.setHeader("Location", "http://localhost:8080/inbulk/calcall");
-//        httpServletResponse.setStatus(302);
         return "monthinfo";
     }
 
 
     @GetMapping("/calconeworker")
     public String calcWorker(@ModelAttribute("selected") Long id, @ModelAttribute("startDate") int startDate,
-                             @ModelAttribute("endDate") int endDate,Model model) throws SQLException {
+                             @ModelAttribute("endDate") int endDate, Model model) throws SQLException {
         if (EstimatedDate.dateForHTML == "не установлена") {
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);
@@ -524,9 +548,9 @@ public class WebController {
      * @throws SQLException
      */
     @PostMapping("/saveone/{id}")
-    protected String saveOne(@PathVariable("id") Long id,@ModelAttribute("startDate") int startDate,
+    protected String saveOne(@PathVariable("id") Long id, @ModelAttribute("startDate") int startDate,
                              @ModelAttribute("endDate") int endDate, MonthTime times, Model model)
-                throws SQLException, IOException {
+            throws SQLException, IOException {
         if (EstimatedDate.dateForHTML == "не установлена") {
             model.addAttribute("estimatedDate", EstimatedDate.dateForHTML);
             model.addAttribute("workers", workers);

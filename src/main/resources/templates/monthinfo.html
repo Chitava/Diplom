@@ -1,36 +1,78 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
-<head th:insert= "~{index :: head}"></head>
+<head th:insert="~{index :: head}"></head>
 <body>
-  <div th:insert= "~{index :: header}"></div>
-  <main class="workfield">
-    <div th:insert= "~{index :: menu}"></div>
+<div th:insert="~{index :: header}"></div>
+<main class="workfield">
+    <div th:insert="~{index :: menu}"></div>
     <section class="resultfield">
         <div class="h1">
-            <h1>Данные за <span th:text="${estimatedDate}"></span> <span th:text="${name}" ></span></h1>
+            <h1>Данные за <span th:text="${estimatedDate}"></span> <span th:text="${name}"></span></h1>
         </div>
         <div class="table__border">
+            <div class="weekend">
+                <div class="day__week">Пн</div>
+                <div class="day__week">Вт</div>
+                <div class="day__week">Ср</div>
+                <div class="day__week">Чт</div>
+                <div class="day__week">Пт</div>
+                <div class="day__week">Сб</div>
+                <div class="day__week">Вс</div>
+            </div>
             <form th:action="@{'/inbulk/save/' + ${id}}" method="post">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <td class="info__td" th:each="day : ${holydays}" th:text="${day.key}" th:style="${day.value} ? 'background:#409647;' : 'background: #ffffff;'"></td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td class="td__info" type="text" th:each="day : ${monthtimes}" th:object="${edittimes}">
-                            <input class="recalculation__time" step="0.01" min="0" type="number"  th:name = "edittime + (${day.key}-1)" th:value="${day.value[0]}" /> ч.
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <button class="button" type="submit">Сохранить</button>
-            </form>
+                <div div class="month__table" th:if="${monthtimes != null}">
+                    <div class="day__month" th:each="entry : ${monthtimes.entrySet()}">
+                        <th:block th:if="${!#strings.startsWith(entry.key, '-')}">
+                            <div class="day"
+                                 th:text="${entry.key}"
+                                 th:style="${holidays?.get(entry.key) ? 'background:#409647' : 'background:#ffffff'}">
+                            </div>
+                            <input class="recalculation__time"
+                                   type="number"
+                                   min="0"
+                                   value="23.00"
+                                   step="0.01"
+                                   th:name="'edittime_' + ${entry.key}"
+                                   th:value="${dayTimes?.get(entry.key) ?: 0}"/>
+                            <div>ч.</div>
+                        </th:block>
+                    </div>
+                </div>
+        <button class="button" type="submit">Сохранить</button>
+        </form>
         </div>
     </section>
     </section>
-    <div th:insert= "~{index :: workersmenu}"></div>
-  </main>
+    <div th:insert="~{index :: workersmenu}"></div>
+</main>
+<script>
+    document.querySelectorAll('.recalculation__time').forEach(input => {
+        let previousValue = parseFloat(input.value) || 0.00;
+
+        input.addEventListener("input", function() {
+            const currentValue = parseFloat(this.value) || 0;
+            const fractionalPart = parseFloat((currentValue % 1).toFixed(2));
+            const direction = currentValue > previousValue ? 'up' : 'down';
+
+            if (direction === 'up' && fractionalPart >= 0.59) {
+                this.value = (Math.floor(currentValue) + 1).toFixed(2);
+            }
+            else if (direction === 'down' && fractionalPart === 0 && currentValue > 0) {
+                this.value = (Math.floor(currentValue) - 1 + 0.59).toFixed(2);
+            }
+            else if (isNaN(currentValue)) {
+                this.value = previousValue.toFixed(2);
+                return;
+            }
+            previousValue = parseFloat(this.value);
+        });
+
+        input.addEventListener("blur", function() {
+            this.value = parseFloat(this.value).toFixed(2);
+        });
+    });
+</script>
 </body>
 </html>
+
+

@@ -1,13 +1,13 @@
 /*Подгружаемые шрифты*/
 
 @font-face {
-	font-family:'Comforta';
-	src: url('../fonts/Comfortaa.ttf');
+font-family: "Comforta";
+src: url("../fonts/Comfortaa.ttf");
 }
 
 @font-face {
-	font-family:'Ubuntu';
-	src: url('../fonts/Ubuntu.ttf');
+font-family: "Ubuntu";
+src: url("../fonts/Ubuntu.ttf");
 }
 
 /*Стиль для всей страницы*/
@@ -15,17 +15,17 @@
     margin: 0;
     padding: 0;
     text-decoration: none;
-    font-family: 'Ubuntu';
+    font-family: "Ubuntu";
 }
 
 /*Стили для body*/
-body {   
+body {
     background-color: #ffffff;
     padding: 0 10px;
 }
 
 /*Стили для фрейма header (Логотип и расчетная дата)*/
-header{
+header {
     display: flex;
     flex-direction: row;
     gap: 1220px;
@@ -35,29 +35,28 @@ header{
 }
 
 /*Стили полей с расчетной датой*/
-.work_date{
+.work_date {
     display: flex;
     font-size: 18px;
     align-items: center;
     gap: 20px;
-
 }
 
 /*Стили для поля с датой расчета заработной платы*/
-#work_date{
+#work_date {
     font-size: 24px;
     color: #e27f29;
 }
 
 /*Стили для общего рабочего фрейма*/
-.workfield{
+.workfield {
     margin-top: 10px;
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
     flex-direction: row;
-    
-    font-family: 'Comforta';
+
+    font-family: "Comforta";
 }
 /*Стили логотипа*/
 .emblem {
@@ -66,19 +65,19 @@ header{
 }
 
 /*Стили для меню расположенного слева на всех страницах */
-.menu{    
+.menu {
     width: 380px;
     height: 85vh;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     padding: 10px;
-    background-color: rgb(233, 241, 241);;
-    border-radius: 10px
+    background-color: rgb(233, 241, 241);
+    border-radius: 10px;
 }
 
 /*Стили для рабочего фрейма вывода текущей информации на всех страницах*/
-.resultfield{
+.resultfield {
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -92,33 +91,33 @@ header{
 }
 
 /*Стиль для заголовка в рабочем фрейме*/
-.h1{
+.h1 {
     margin: 0 auto;
     width: 80%;
 }
 
-.resultfield h1{
+.resultfield h1 {
     margin: 30px 10px 50px;
     font-size: 30px;
     color: #e27f29;
-    font-family: 'Comforta';
+    font-family: "Comforta";
 }
 
 /*Стиль формы выбора рабочей даты расчета зарплаты на странице index.html*/
-.estimated_form{
+.estimated_form {
     display: flex;
     flex-direction: column;
 }
 
 /*Стили для поля выбора даты на странице index.html*/
-.date{
+.date {
     width: 200px;
     text-align: center;
     font-size: 18px;
-    margin: 15px auto; 
+    margin: 15px auto;
 }
- /*Стили меню сотрудников расположенное с права на всех страницах*/
-.workersmenu{
+/*Стили меню сотрудников расположенное с права на всех страницах*/
+.workersmenu {
     width: 380px;
     display: flex;
     flex-direction: column;
@@ -130,39 +129,38 @@ header{
     overflow-y: auto;
 }
 
-
 /*стили для кнопок*/
 .button {
     display: inline-block;
-    font-family: 'Comforta';
+    font-family: "Comforta";
     color: white;
-    padding: .5em 2em;
+    padding: 0.5em 2em;
     outline: none;
     border-width: 2px 0;
     border-style: solid none;
-    border-color: #FDBE33 #000 #D77206;
+    border-color: #fdbe33 #000 #d77206;
     border-radius: 6px;
     background: linear-gradient(#e27f29, #f78b2d) #e27f29;
     transition: 0.2s;
     margin: 10px;
 }
 
-.width{
+.width {
     width: 200px;
     margin-left: auto;
     margin-right: auto;
 }
 
 /*Стили срабатывают при наведение на кнопку*/
-.button:hover { 
-    background: linear-gradient(#f5ae00, #f59500) #f5ae00; 
+.button:hover {
+    background: linear-gradient(#f5ae00, #f59500) #f5ae00;
 }
 
 /*Ситили срабатывают при нажатии на кнопку*/
 .button:active {
-    background: linear-gradient(#f59500, #f5ae00) #f59500; 
+    background: linear-gradient(#f59500, #f5ae00) #f59500;
 }
-  
+
 /*Стили для кнопок с информацией о сотрудниках в меню сотрудников расположенное справа на всех страницах*/
 .worker__button {
     display: flex;
@@ -172,18 +170,18 @@ header{
     height: 20px;
 }
 
-.worker__name{
+.worker__name {
     margin-bottom: 10px;
 }
-.worker__info{
+.worker__info {
     display: none;
     flex-direction: column;
     margin-top: 15px;
-    align-items: left;
-    gap:5px;
+    align-items: flex-start;
+    gap: 5px;
 }
 
-.worker__inf{
+.worker__inf {
     display: flex;
 }
 
@@ -196,7 +194,7 @@ header{
 }
 
 /*Стили для формы загрузки файлов на странице writer.html*/
-.file{
+.file {
     margin-top: 30px;
     display: flex;
     flex-direction: column;
@@ -204,12 +202,12 @@ header{
     margin: 30px 10px 50px;
     font-size: 30px;
     color: #e27f29;
-    font-family: 'Comforta';
+    font-family: "Comforta";
     gap: 20px;
 }
 
 /*Стили для страницы addworker.html*/
-.worker{
+.worker {
     display: flex;
     flex-direction: row;
     width: 90%;
@@ -218,34 +216,34 @@ header{
 }
 
 /*Стили для полей со статическими названиями*/
-.worker__field{
+.worker__field {
     width: 48%;
     display: flex;
     flex-direction: column;
-    align-items:flex-start;
+    align-items: flex-start;
     gap: 20px;
     font-size: 24px;
     color: #e27f29;
-    font-family: 'Comforta';
+    font-family: "Comforta";
     justify-content: center;
 }
 
 /*Стили для динамических полей*/
-.worker_field_data{
+.worker_field_data {
     width: 45%;
     display: flex;
     flex-direction: column;
-    align-items:flex-start;
+    align-items: flex-start;
     gap: 23px;
-    font-family: 'Comforta';
+    font-family: "Comforta";
 }
 
-.peymentInHollydays{
+.peymentInHollydays {
     display: none;
 }
 
 /*Стили для полей ввода фио и табельный номер*/
-.input__width{
+.input__width {
     width: 100%;
     font-size: 24px;
     padding: 0 10px;
@@ -254,7 +252,7 @@ header{
 }
 
 /*Стили для полей со ставками*/
-.input__heigh{
+.input__heigh {
     width: 100px;
     font-size: 24px;
     padding: 0 5px;
@@ -263,94 +261,151 @@ header{
 }
 
 /*Стили для поля селектора руководитель*/
-.check__box{
+.check__box {
     margin-left: -45px;
 }
 
 /*Стили для страницы удаления сотрудников*/
 
-.delworker{
+.delworker {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 30px;
 }
 
-.delworkers{
+.delworkers {
     border: none;
     width: 350px;
     height: 30px;
-    font-family: 'Comforta';
+    font-family: "Comforta";
     font-size: 16px;
     border-radius: 5px;
 }
 
-.delbuttion{
+.delbuttion {
     display: flex;
-    justify-content:center;
+    justify-content: center;
 }
 
 /*Стили для страницы расчета заработной платы*/
 
 .table__border {
-  width: 55vw;
-  margin-left: 20px;
+    width: 55vw;
+    margin-left: 20px;
 }
 
 .table {
-  border-radius: 16px;
-  width: 100%;
-  margin-right: 100px;
-  font-family: "Comforta";
-  border-radius: 10px;
-  background-color: #ffffff;
-  border-spacing: 0px;
-  border-collapse: separate;
+    border-radius: 16px;
+    width: 100%;
+    margin-right: 100px;
+    font-family: "Comforta";
+    border-radius: 10px;
+    background-color: #ffffff;
+    border-spacing: 0px;
+    border-collapse: separate;
 }
 
-thead{
-height:30px
+thead {
+    height: 30px;
 }
 
 thead tr {
-  border-collapse: separate;
-  font-family: "Comforta";
-  font-weight: bold;
-  font-size: 14px;
-  border-radius: 16px;
+    border-collapse: separate;
+    font-family: "Comforta";
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 16px;
 }
 
 thead th {
-  height: 50px;
-  column-fill: auto;
-  width: 150px;
+    height: 50px;
+    column-fill: auto;
+    width: 150px;
 }
 
 td {
-  height: 58px;
+    height: 58px;
 }
 
-.info__td{
-height: 24px;
-border-radius: 10px;}
+.info__td {
+    height: 24px;
+    border-radius: 10px;
+    border-spacing: 2px;
+}
 
 .all__buttons {
-  margin-top: 20px;
+    margin-top: 20px;
 }
 
 .recalculation {
-  width: 60px;
+    width: 60px;
 }
 
-.recalculation__time{
-    width: 40px;
-    align-text: center;
+.recalculation__time {
+    width: 100%;
+    text-align: center;
+    border: none;
+    outline: none;
+    font-size: 20px;
 }
+
 
 .recalculation__button {
-  width: 100px;
-  height: 25px;
-  align-items: center;
-  font-size: 10px;
-  padding: 0 0;
+    width: 100px;
+    height: 25px;
+    align-items: center;
+    font-size: 10px;
+    padding: 0 0;
 }
+
+/*
+Стили для страницы с выводом по сотруднику за месяц
+ */
+
+.weekend{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+
+
+.month__table{
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 30px 10px;
+
+}
+
+.day__week{
+    box-shadow: 0 0 3px #e27f29;
+    height: 1.5rem;
+    width: 10rem;
+    border-radius: 5px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.day__month{
+    font-size: 20px;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.day{
+    height: 40%;
+    border-radius: 10px 10px 0 0;
+    border-bottom: #f5ae00 2px solid;
+}
+
+
+
+
+
+
+

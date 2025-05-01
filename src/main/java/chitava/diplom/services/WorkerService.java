@@ -62,7 +62,7 @@ public interface WorkerService {
      *
      * @return сообщение о выполненой операции
      */
-    String getHollydays(String date);
+    boolean getHollydays(String date);
 
     /**
      * Метод добавление новых данных о посещении сотрудников
